@@ -50,7 +50,15 @@ void main()
     // It will be sent down the pipeline upon leaving this program
     // It needs to be a 4D vector (x,y,z,w)	
 	
-    gl_Position = vec4(vCenter+vPosition, 0.0, 1.0);
+	float s = sin(vTheta);
+	float c = cos(vTheta);
+
+	float posX = vCenter.x + vPosition.x;
+	float posY = vCenter.y + vPosition.y;
+
+	gl_Position.x = (c * posX) - (s * posY);
+	gl_Position.y = (s * posX) + (c * posY);
+	gl_Position.zw = vec2(0.0, 1.0);
 	color = vec4(vColor, 1.0);
 	
 	// Try out errors in the shaders ... try this statment instead

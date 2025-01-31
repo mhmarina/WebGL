@@ -12,6 +12,9 @@ var gl;
 var vCenter;
 var centers;
 var justOne = 0;
+var theta = 0; //initialize object to not rotate
+var deltaRadians = ( 2 * 3.149)/(24 * 60);
+var vTheta;
  
 // When all the files have been read, the window system call the init function that holds our program
 // This is an example of an event listener/handler
@@ -155,10 +158,13 @@ function render() {
 	// *** for translation, rotation (theta)
 	// *** Use for loop
 
+	theta += deltaRadians
+
 	console.log(centers)
 	for(let i = 0; i < 11; i++){
 		// set center uniform
 		gl.uniform2f(vCenter, centers[i][0], centers[i][1])
+		gl.uniform1f(vTheta, i == 0 ? theta : -theta);
 		// draw triangles for prototype and instances
 		gl.drawArrays(gl.TRIANGLES, 0, 51)
 	}
