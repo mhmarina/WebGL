@@ -35,7 +35,8 @@ This program uses simpleSquare.js and MV.js in the Common folder.
 // *** And where did we assign it??????
 // *** I know we reference it in the js file but idk where we get it from...
 // *************************
-attribute vec2 vCenter;
+uniform vec2 vCenter;
+uniform float vTheta;
 attribute vec2 vPosition;
 attribute vec3 vColor;
 varying vec4 color; //pass this value to frag shader
