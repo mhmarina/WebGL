@@ -164,7 +164,9 @@ function render() {
 	for(let i = 0; i < 11; i++){
 		// set center uniform
 		gl.uniform2f(vCenter, centers[i][0], centers[i][1])
-		gl.uniform1f(vTheta, i == 0 ? theta : -theta);
+		// rotate prototype clockwise
+		// instances counterclockwise
+		gl.uniform1f(vTheta, i == 0 ? -theta : theta);
 		// draw triangles for prototype and instances
 		gl.drawArrays(gl.TRIANGLES, 0, 51)
 	}
