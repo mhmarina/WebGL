@@ -1,28 +1,8 @@
 <!DOCTYPE html>
-
-<!-- 
-SimpleSquare Demo
-This is a simple html document with a vertex shader and a fragment shader 
-
-This program uses simpleSquare.js and MV.js in the Common folder.
-
--->
-<!-- This is how you make a comment in HTML  -->
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-
-<!-- Create a title in the browser Tab  -->
-<title>Kaleidescope</title>
-
-<!-- A webGL program MUST have a vertex shader and a fragment shader -->
-
-<!-- Vertex shader written in GLSL. -->
-<!-- Notice the script tag -->
-<!-- This is a "pass through" vertex shader  -->
-<!-- Just passing the vertex to the fragment shader without calculations  -->
-   
+<title>Kaleidescope</title>   
 <script id="vertex-shader" type="x-shader/x-vertex">
 
 // The vertex shader is called for each vertex in the vertex buffer 
@@ -54,13 +34,11 @@ void main()
 	gl_Position.x = (c * posX) - (s * posY);
 	gl_Position.y = (s * posX) + (c * posY);
 	gl_Position.zw = vec2(0.0, 1.0);
-	color = vec4(vColor, 1.0);
-	
-	// Try out errors in the shaders ... try this statment instead
-	//gl_Position = vPosition;
-	 
-	// See the class Resources page for a link to a GLSL help sheet
 
+	// rudimentary implementation / proof of concept
+	// implement an actual function... use interpolation mayhaps
+	color = vec4(vColor.x, vColor.y, vColor.z, 1.0) + (vec4(1,0,0,0) * gl_Position.x) - (vec4(0,1,0,0) * gl_Position.y);
+	
 }
 </script>
 
@@ -87,18 +65,11 @@ void main()
 }
 </script>
 
-<!-- Here are the js files used by this program  -->
-<!-- If the Common folder not in correct place, nothing will display  --> 
-<!-- The first three files are libraries and the last one is our program -->
-
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
 <script type="text/javascript" src="../Common/initShaders.js"></script>
 <script type="text/javascript" src="../Common/MV.js"></script>
 <script type="text/javascript" src="Kaleidescope.js"></script>
 
-
-
-<!-- Inline CSS code to make the text prettier -->
 <style>
 body
 {
@@ -123,19 +94,9 @@ body
 &nbsp; &nbsp;&nbsp; Find the print statements in the js code.
 </p>
 
-<!-- Create the window for displaying the simple square with HTML5 canvas element  -->
-<!-- Specify the size in pixels -->
-<!-- A border helps when getting started learning computer graphics -->
-
  <canvas id="gl-canvas" width="500" height="500" style="border:2px solid #000000;"> 
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
-
-<!-- The canvas context is an object with properties and methods that you can use to render graphics inside the canvas element. The context can be 2d or webgl (3d).
--->
-
-<p>You can add text below the canvas too!</p>
-
 
 </body>
 </html>

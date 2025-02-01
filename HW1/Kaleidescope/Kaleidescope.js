@@ -34,6 +34,7 @@ window.onload = function init()
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 		
+	// 51 vertices
     var vertices = [
         vec2(-0.5,-1), //1
 		vec2(-1, -0.5), //2
@@ -190,9 +191,6 @@ window.onload = function init()
 function render() {
 	    
     gl.clear( gl.COLOR_BUFFER_BIT );
-
-	// draw using vertices already loaded in the GPU 
-	// here we draw two triangles 0,1,2 and 1,2,3
     
 	// *** send uniform attr to vertex  shader
 	// *** for translation, rotation (theta)
