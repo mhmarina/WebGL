@@ -35,10 +35,13 @@ void main()
 	gl_Position.y = (s * posX) + (c * posY);
 	gl_Position.zw = vec2(0.0, 1.0);
 
-	// rudimentary implementation / proof of concept
-	// implement an actual function... use interpolation mayhaps
-	color = vec4(vColor.x, vColor.y, vColor.z, 1.0) + (vec4(1,0,0,0) * gl_Position.x) - (vec4(0,1,0,0) * gl_Position.y);
-	
+	// interpolate between vColor.x and red for the x value
+	// interpolate between vColor.y and green for y value:
+	float colorX = ((1.0 - abs(gl_Position.x)) * vColor.x) + (abs(gl_Position.x) * 1.0); //add red as the magnitude of x increases
+	float colorY  = ((1.0 - abs(gl_Position.y)) * vColor.y) + (abs(gl_Position.y) * 1.0); //add green  as the magnitude of y increases
+
+	// this color is sent to the fragment shader (varying variable.)
+	color = vec4(colorX, colorY, vColor.z, 1.0);
 }
 </script>
 
@@ -89,14 +92,12 @@ body
 <body>
 <h1> HW1: Kaleidoscope </h1>
 <h2> By Marina Nasralla </h2>
-<p>
-!! Activate debugging in your browser with F12 and select "Console" in the debugger menu.</br>
-&nbsp; &nbsp;&nbsp; Find the print statements in the js code.
-</p>
 
  <canvas id="gl-canvas" width="500" height="500" style="border:2px solid #000000;"> 
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
-
+<p>The color function interpolates between vColor.x and red for the x value and between vColor.y and green for y value. 
+	It adds red as the magnitude of x increases, and adds green as the magnitude of y increases. 
+	At x=0 and y=0, the original color is retained, and demonstrated by the prototype at the center.</p>
 </body>
 </html>
