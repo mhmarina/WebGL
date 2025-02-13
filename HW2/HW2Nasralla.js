@@ -1,9 +1,36 @@
-
+var cubeVertices = []
+var colors = []
 
 window.onload = function init () {
     // initialize webgl context
     canvas = document.getElementById("gl-canvas")
     gl = WebGLUtils.setupWebGL(canvas)
     if(!gl){ alert("WebGl is not available. :(")}
-    console.log(gl)
+    gl.viewport( 0, 0, canvas.width, canvas.height);
+
+
+    // initailiaze program (vertex and fragment shader) & use it
+    var program = initShaders(gl, "vertex-shader", "fragment-shader")
+    gl.useProgram(program)
+
+    // call this function from CreateCube.js
+    // this will populate our cubeVertices and colors arrays
+    // javascript sucks :D
+    createCube()
+
+    // create vertex buffer
+    var vertexBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(cubeVertices), gl.STATIC_DRAW)
+    var vPosition = gl.getAttribLocation(program, "vPosition")
+    gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(vPosition)
+
+    // create color buffer
+    var colorBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW)
+    var vColor = gl.getAttribLocation(program, "vColor")
+    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0)
+
 }

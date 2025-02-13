@@ -4,13 +4,26 @@
         <script type="text/javascript" src="../Common/webgl-utils.js"></script>
         <script type="text/javascript" src="../Common/initShaders.js"></script>
         <script type="text/javascript" src="../Common/MV.js"></script>
+        <script type="text/javascript" src="CreateCube.js"></script>
         <script type="text/javascript" src="HW2Nasralla.js"></script>
-        <script id="vertex-shader" type="x-shader/x-vertex">
 
+        <script id="vertex-shader" type="x-shader/x-vertex">
+            attribute vec3 vPosition;
+            attribute vec4 vColor;
+            void main(){
+
+            }
         </script>
+    
         <script id="fragment-shader" type="x-shader/x-fragment">
-            
+            // must set precision
+            precision mediump float;
+            varying vec4 color;
+            void main(){
+                
+            }
         </script>
+
     </head>
     <body>
         <canvas id="gl-canvas" width="512" height="512">

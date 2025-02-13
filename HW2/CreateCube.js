@@ -52,6 +52,7 @@ function quad(a, b, c, d)
 
     console.log("CreateCube: indices = ",indices);
 
+    // I guess cubeVertices and colors are variables I define in the main app?
     for ( var i = 0; i < indices.length; ++i ) {
         cubeVertices.push( vertices[indices[i]] );
         colors.push( vertexColors[indices[i]] );
