@@ -10,8 +10,12 @@
         <script id="vertex-shader" type="x-shader/x-vertex">
             attribute vec3 vPosition;
             attribute vec4 vColor;
-            void main(){
+            varying vec4 color; 
 
+            void main(){
+                gl_Position.xyz = vPosition;
+                gl_Position.w = 1.0;
+                color = vColor;
             }
         </script>
     
@@ -20,7 +24,7 @@
             precision mediump float;
             varying vec4 color;
             void main(){
-                
+                gl_FragColor = color;
             }
         </script>
 

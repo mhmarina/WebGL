@@ -3,7 +3,8 @@ var numVertices = 8;
 var numTriangles = 12;
 
 
-
+// add two vertices to create tetrahedrons
+// to the end of this cube
 var vertices = [
 	vec3( 0.0, 0.0,  0.0),
 	vec3( 0.0, 1.0,  0.0 ),
@@ -15,16 +16,16 @@ var vertices = [
 	vec3( 1.0, 0.0, -1.0 )
 ];
 
-// Create your own colors!!
+// TODO: Create your own colors!!
 var vertexColors = [
-        [ 1.0, 1.0, 1.0, 1.0 ],   
-        [ 1.0, 1.0, 1.0, 1.0 ],   
-        [ 1.0, 1.0, 1.0, 1.0 ],   
-        [ 1.0, 1.0, 1.0, 1.0 ],   
-        [ 1.0, 1.0, 1.0, 1.0 ],   
-        [ 1.0, 1.0, 1.0, 1.0 ],  
-        [ 1.0, 1.0, 1.0, 1.0 ],  
-        [ 1.0, 1.0, 1.0, 1.0 ]   
+        [ 1.0, 0.0, 0.0, 1.0 ],   
+        [ 0.0, 1.0, 0.0, 1.0 ],   
+        [ 0.0, 0.0, 1.0, 1.0 ],   
+        [ 1.0, 1.0, 0.0, 1.0 ],   
+        [ 1.0, 0.0, 1.0, 1.0 ],   
+        [ 0.0, 1.0, 1.0, 1.0 ],  
+        [ 0.5, 0.5, 0.5, 1.0 ],  
+        [ 1.0, 0.5, 1.0, 1.0 ]   
 ];
 
 	
@@ -55,8 +56,7 @@ function quad(a, b, c, d)
     // I guess cubeVertices and colors are variables I define in the main app?
     for ( var i = 0; i < indices.length; ++i ) {
         cubeVertices.push( vertices[indices[i]] );
-        colors.push( vertexColors[indices[i]] );
-               
+        colors.push( vertexColors[indices[i]] );           
     }
 }
 

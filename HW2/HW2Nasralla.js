@@ -15,7 +15,6 @@ window.onload = function init () {
 
     // call this function from CreateCube.js
     // this will populate our cubeVertices and colors arrays
-    // javascript sucks :D
     createCube()
 
     // create vertex buffer
@@ -32,5 +31,15 @@ window.onload = function init () {
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW)
     var vColor = gl.getAttribLocation(program, "vColor")
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(vColor)
 
+    console.log(vertexBuffer)
+    console.log(colorBuffer)
+    render()
+}
+
+function render(){
+    gl.clear( gl.COLOR_BUFFER_BIT );
+    gl.drawArrays(gl.TRIANGLES, 0, 36)
+    //requestAnimationFrame(render)
 }
