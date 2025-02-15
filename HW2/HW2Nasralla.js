@@ -12,6 +12,7 @@ window.onload = function init () {
     // initailiaze program (vertex and fragment shader) & use it
     var program = initShaders(gl, "vertex-shader", "fragment-shader")
     gl.useProgram(program)
+    gl.enable(gl.DEPTH_TEST) // enable Z-buffer
 
     // call this function from CreateCube.js
     // this will populate our cubeVertices and colors arrays
@@ -40,6 +41,6 @@ window.onload = function init () {
 
 function render(){
     gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.drawArrays(gl.TRIANGLES, 0, 36)
+    gl.drawArrays(gl.TRIANGLES, 0, 45)
     //requestAnimationFrame(render)
 }

@@ -1,6 +1,7 @@
 
 var numVertices = 8;
 var numTriangles = 12;
+//var j = 0;
 
 
 // add two vertices to create tetrahedrons
@@ -13,7 +14,9 @@ var vertices = [
 	vec3( 0.0, 0.0, -1.0 ),
 	vec3( 0.0, 1.0, -1.0),
 	vec3( 1.0, 1.0, -1.0 ),
-	vec3( 1.0, 0.0, -1.0 )
+	vec3( 1.0, 0.0, -1.0 ), // here come the tetrahedron vectors...
+    vec3(-0.5, 0.5, -0.5),
+    vec3(1.5, 0.5, -0.5)
 ];
 
 // TODO: Create your own colors!!
@@ -37,7 +40,30 @@ function createCube()
     quad( 6, 5, 1, 2 );
     quad( 4, 5, 6, 7 );
     quad( 5, 4, 0, 1 );
-	
+    triad(0, 1, 5, 4, 8 );
+    //triad(3, 7, 6, 2, 9 );
+}
+
+function triad(a, b, c, d, e){
+    // similar to quad(), I want to create 8 triangles that will form
+    // the tetrahedrons on the sides...
+    // b ------- c
+    // | \     / |
+    // |    e    |
+    // | /     \ |
+    // a ------- d  // something like this...
+
+    var indices = [a ,b, c, d]
+
+    for ( var i = 0; i < 4; i++){
+        cubeVertices.push(vertices[indices[i]])
+        cubeVertices.push(vertices[e]) //center of pyramid
+        cubeVertices.push(vertices[(i+1)%4]) //push next vertex or wrap around
+        //console.log(cubeVertices.slice(-3))
+        for ( var j = 0; j < 3; j++ ){
+            colors.push(vertexColors[indices[i]])
+        }
+    }      
 }
 
 function quad(a, b, c, d) 
@@ -46,17 +72,11 @@ function quad(a, b, c, d)
     // We need to parition the quad into two triangles in order for
     // WebGL to be able to render it.  In this case, we create two
     // triangles from the quad indices
-    
-    //vertex color assigned by the index of the vertex
-    
-    var indices = [ a, b, c, a, c, d ];
+        var indices = [ a, b, c, a, c, d ];
 
-    console.log("CreateCube: indices = ",indices);
-
-    // I guess cubeVertices and colors are variables I define in the main app?
     for ( var i = 0; i < indices.length; ++i ) {
         cubeVertices.push( vertices[indices[i]] );
-        colors.push( vertexColors[indices[i]] );           
+        colors.push( vertexColors[indices[i]] ); 
     }
 }
 
