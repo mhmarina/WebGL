@@ -13,7 +13,8 @@
             varying vec4 color; 
 
             void main(){
-                gl_Position.xyz = vPosition;
+                gl_Position.x = vPosition.x - 0.5; // -0.5 translation in x dir
+                gl_Position.yz = vPosition.yz;
                 gl_Position.w = 1.0;
                 color = vColor;
             }

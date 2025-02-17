@@ -21,14 +21,14 @@ var vertices = [
 
 // TODO: Create your own colors!!
 var vertexColors = [
-        [ 1.0, 0.0, 0.0, 1.0 ],   
-        [ 0.0, 1.0, 0.0, 1.0 ],   
-        [ 0.0, 0.0, 1.0, 1.0 ],   
-        [ 1.0, 1.0, 0.0, 1.0 ],   
-        [ 1.0, 0.0, 1.0, 1.0 ],   
-        [ 0.0, 1.0, 1.0, 1.0 ],  
-        [ 0.5, 0.5, 0.5, 1.0 ],  
-        [ 1.0, 0.5, 1.0, 1.0 ]   
+        [ 1.0, 0.0, 0.0, 1.0 ],  // red 
+        [ 0.0, 1.0, 0.0, 1.0 ],  // green
+        [ 0.0, 0.0, 1.0, 1.0 ],  // blue
+        [ 1.0, 1.0, 0.0, 1.0 ],  // yellow
+        [ 1.0, 0.0, 1.0, 1.0 ],  // pink, this is the front face for some reason
+        [ 0.0, 1.0, 1.0, 1.0 ],  // cyan
+        [ 0.5, 0.5, 0.5, 1.0 ],  // grey
+        [ 0.0, 0.0, 0.0, 1.0 ]   // black
 ];
 
 	
@@ -38,10 +38,10 @@ function createCube()
     quad( 2, 3, 7, 6 );
     quad( 3, 0, 4, 7 );
     quad( 6, 5, 1, 2 );
-    quad( 4, 5, 6, 7 );
+    quad( 4, 5, 6, 7 ); // this is the front square with z = -1
     quad( 5, 4, 0, 1 );
-    triad(0, 1, 5, 4, 8 );
-    //triad(3, 7, 6, 2, 9 );
+    triad(4, 0, 1, 5, 8 );
+    triad(3, 7, 6, 2, 9 );
 }
 
 function triad(a, b, c, d, e){
@@ -59,9 +59,8 @@ function triad(a, b, c, d, e){
         cubeVertices.push(vertices[indices[i]])
         cubeVertices.push(vertices[e]) //center of pyramid
         cubeVertices.push(vertices[(i+1)%4]) //push next vertex or wrap around
-        //console.log(cubeVertices.slice(-3))
         for ( var j = 0; j < 3; j++ ){
-            colors.push(vertexColors[indices[i]])
+            colors.push(vertexColors[i])
         }
     }      
 }
@@ -76,7 +75,7 @@ function quad(a, b, c, d)
 
     for ( var i = 0; i < indices.length; ++i ) {
         cubeVertices.push( vertices[indices[i]] );
-        colors.push( vertexColors[indices[i]] ); 
+        colors.push( vertexColors[indices[0]] ); 
     }
 }
 

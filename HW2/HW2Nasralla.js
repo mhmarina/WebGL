@@ -41,6 +41,6 @@ window.onload = function init () {
 
 function render(){
     gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.drawArrays(gl.TRIANGLES, 0, 45)
+    gl.drawArrays(gl.TRIANGLES, 0, 100)
     //requestAnimationFrame(render)
 }
