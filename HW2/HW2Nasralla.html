@@ -13,7 +13,9 @@
             varying vec4 color; 
 
             void main(){
-                gl_Position.x = vPosition.x - 0.5; // -0.5 translation in x dir
+                // TODO: figure out if this is the right way to do this...
+                // I probably would want to apply a translation transformation 
+                gl_Position.x = vPosition.x - 0.125; // translation in x dir
                 gl_Position.yz = vPosition.yz;
                 gl_Position.w = 1.0;
                 color = vColor;

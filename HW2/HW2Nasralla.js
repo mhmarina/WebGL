@@ -17,6 +17,12 @@ window.onload = function init () {
     // call this function from CreateCube.js
     // this will populate our cubeVertices and colors arrays
     createCube()
+    
+    // scale vertices:
+    // TODO: figure out if this is the right way to do this
+    // I probably want to apply a scaling matrix ?
+    cubeVertices = cubeVertices.map((e) => {return e.map((f) => f*0.25)})
+
 
     // create vertex buffer
     var vertexBuffer = gl.createBuffer()
