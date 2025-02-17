@@ -15,8 +15,8 @@ var vertices = [
 	vec3( 0.0, 1.0, -1.0),
 	vec3( 1.0, 1.0, -1.0 ),
 	vec3( 1.0, 0.0, -1.0 ), // here come the tetrahedron vectors...
-    vec3(-0.5, 0.5, -0.5),
-    vec3(1.5, 0.5, -0.5)
+    vec3( 0.5, 0.5, -1.5 ),
+    vec3( 0.5, 0.5, 0.5 )
 ];
 
 // TODO: Create your own colors!!
@@ -40,8 +40,8 @@ function createCube()
     quad( 6, 5, 1, 2 );
     quad( 4, 5, 6, 7 ); // this is the front square with z = -1
     quad( 5, 4, 0, 1 );
-    triad(4, 0, 1, 5, 8 );
-    triad(3, 7, 6, 2, 9 );
+    triad(4, 7, 6, 5, 8);
+    triad(0, 3, 2, 1, 9);
 }
 
 function triad(a, b, c, d, e){
@@ -53,14 +53,22 @@ function triad(a, b, c, d, e){
     // | /     \ |
     // a ------- d  // something like this...
 
-    var indices = [a ,b, c, d]
+    var indices = [a , b, c, d]
+    var triColors = [
+        [ 1.0, 0.0, 0.0, 1.0 ],  // red 
+        [ 0.0, 1.0, 0.0, 1.0 ],  // green
+        [ 0.0, 0.0, 1.0, 1.0 ],  // blue
+        [ 1.0, 1.0, 0.0, 1.0 ]  // yellow
+    ]
 
     for ( var i = 0; i < 4; i++){
         cubeVertices.push(vertices[indices[i]])
         cubeVertices.push(vertices[e]) //center of pyramid
-        cubeVertices.push(vertices[(i+1)%4]) //push next vertex or wrap around
+        cubeVertices.push(vertices[indices[(i+1)%4]]) //push next vertex or wrap around
+
+        console.log(cubeVertices.slice(-3))
         for ( var j = 0; j < 3; j++ ){
-            colors.push(vertexColors[i])
+            colors.push(triColors[i])
         }
     }      
 }
