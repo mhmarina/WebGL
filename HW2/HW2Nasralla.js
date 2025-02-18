@@ -1,5 +1,7 @@
 var cubeVertices = []
 var colors = []
+var theta = [0,0,0]
+var thetaLoc;
 
 window.onload = function init () {
     // initialize webgl context
@@ -40,13 +42,21 @@ window.onload = function init () {
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0)
     gl.enableVertexAttribArray(vColor)
 
+    //theta
+    thetaLoc = gl.getUniformLocation(program, "theta")
+
     console.log(vertexBuffer)
     console.log(colorBuffer)
     render()
 }
 
 function render(){
+    theta[0] += 0.2
+    theta[1] += 0.1
+    
+    gl.uniform3fv(thetaLoc, theta);
+
     gl.clear( gl.COLOR_BUFFER_BIT );
     gl.drawArrays(gl.TRIANGLES, 0, 100)
-    //requestAnimationFrame(render)
+    requestAnimationFrame(render)
 }
