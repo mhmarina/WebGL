@@ -8,9 +8,11 @@
         <script type="text/javascript" src="HW2Nasralla.js"></script>
 
         <script id="vertex-shader" type="x-shader/x-vertex">
+
             attribute vec3 vPosition;
             attribute vec4 vColor;
             uniform vec3 theta;
+            uniform vec3 mvVector;
             varying vec4 color; 
 
             void main(){
@@ -35,7 +37,8 @@
                         s.z,  c.z, 0.0, 0.0,
                         0.0,  0.0, 1.0, 0.0,
                         0.0,  0.0, 0.0, 1.0 ); // rotation about the z axis
-
+                
+                // this will be variable based on a slider value
                 mat4 scale = mat4(
                     0.25, 0.0, 0.0, 0.0,
                     0.0, 0.25, 0.0, 0.0,
@@ -47,14 +50,10 @@
                     1.0, 0.0, 0.0, 0.0,
                     0.0, 1.0, 0.0, 0.0,
                     0.0, 0.0, 1.0, 0.0,
-                    -0.5, -0.5, 0.0, 1.0
+                    -0.5 + mvVector.x, -0.5 + mvVector.y, 0.0, 1.0
                 );
-            
-                gl_Position.xyz = vPosition.xyz; // translation in x dir
-                gl_Position.w = 1.0;
 
-                gl_Position = scale * translate * rz * ry * rx * gl_Position;
-                color = vColor;
+                gl_Position = translate * rz * ry * rx * vec4(vPosition, 1.0) * scale;                color = vColor;
             }
         </script>
     

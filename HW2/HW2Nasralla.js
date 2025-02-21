@@ -1,7 +1,9 @@
 var cubeVertices = []
 var colors = []
-var theta = [0,0,0]
 var thetaLoc;
+var mvVecLoc;
+var arrayOfTheta = []
+var arrayOfVector = []
 
 window.onload = function init () {
     // initialize webgl context
@@ -38,19 +40,46 @@ window.onload = function init () {
 
     //theta
     thetaLoc = gl.getUniformLocation(program, "theta")
+    //movementVector
+    mvVecLoc = gl.getUniformLocation(program, "mvVector")
 
-    console.log(vertexBuffer)
-    console.log(colorBuffer)
+    for(var i = 0; i < 11; i++){
+        var mvVector = [0,0,0]
+        mvVector[0] = Math.random() * 2 - 1
+        mvVector[1] = Math.random() * 2 - 1
+        mvVector = normalize(mvVector)
+
+        arrayOfTheta.push([0,0,0])
+        arrayOfVector.push(mvVector)
+    }
+
+    // instantiate
     render()
 }
 
 function render(){
-    theta[0] += 0.2
-    theta[1] += 0.1
-    
-    gl.uniform3fv(thetaLoc, theta);
 
     gl.clear( gl.COLOR_BUFFER_BIT );
+
+    // draw the center prototype:
+    // which does not move or rotate 
+    gl.uniform3fv(thetaLoc, arrayOfTheta[0]);
+    gl.uniform3fv(mvVecLoc, [0,0,0]);
     gl.drawArrays(gl.TRIANGLES, 0, 100)
+
+
+    for(var i = 1; i < 10; i++){
+        // TODO: make this more dynamic or random:
+        arrayOfTheta[i][0] += 2.0
+
+        // currently this is exponential
+        // TODO: Figure out if this is okay
+        arrayOfVector[i][0] *= 1.05
+        arrayOfVector[i][1] *= 1.05
+        gl.uniform3fv(thetaLoc, arrayOfTheta[i]);
+        gl.uniform3fv(mvVecLoc, arrayOfVector[i]);
+        gl.drawArrays(gl.TRIANGLES, 0, 100)
+    }
+
     requestAnimationFrame(render)
 }

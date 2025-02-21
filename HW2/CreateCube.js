@@ -66,7 +66,6 @@ function triad(a, b, c, d, e){
         cubeVertices.push(vertices[e]) //center of pyramid
         cubeVertices.push(vertices[indices[(i+1)%4]]) //push next vertex or wrap around
 
-        console.log(cubeVertices.slice(-3))
         for ( var j = 0; j < 3; j++ ){
             colors.push(triColors[i])
         }
