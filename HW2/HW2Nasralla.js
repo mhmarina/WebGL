@@ -17,6 +17,9 @@ var numInstances = 10
 window.onload = function init () {
     // initialize webgl context
     canvas = document.getElementById("gl-canvas")
+    var numObjSlider = document.getElementById("numObj-slider")
+    var scaleSlider = document.getElementById("scale-slider")
+
     gl = WebGLUtils.setupWebGL(canvas)
     if(!gl){ alert("WebGl is not available. :(")}
     gl.viewport( 0, 0, canvas.width, canvas.height);
@@ -48,8 +51,26 @@ window.onload = function init () {
     gl.enableVertexAttribArray(vColor)
 
     // 
+    initializeArrays()
     modelViewLoc = gl.getUniformLocation(program, "vModelView")
 
+    // TODO: Figure out this shit
+    canvas.addEventListener('click', (e) => toggleAnimation(e))
+    numObjSlider.addEventListener('change', (e)=>{
+        numInstances = numObjSlider.value
+        initializeArrays()
+    })
+    // I would have to re-populate arrays for this
+    scaleSlider.addEventListener('change', (e)=>{
+        scaleVal = scaleSlider.value
+    })
+
+    // instantiate
+    render()
+}
+
+function initializeArrays(){
+    isMoving = false
     // populate vector and theta arrays
     for(var i = 0; i < numInstances; i++){
         // create a random vector for each instance
@@ -57,18 +78,15 @@ window.onload = function init () {
         mvVector[0] = Math.random() * 5 - 3
         mvVector[1] = Math.random() * 3 - 2
         mvVector = normalize(mvVector)
-
         arrayOfTheta.push(0)
         arrayOfVector.push(mvVector)
     }
-
-    canvas.addEventListener('click', (e) => toggleAnimation(e))
-
-    // instantiate
-    render()
 }
 
 function toggleAnimation(e){
+    // TODO: on click when all instances are off the screen,
+    // reinstantiate them
+
     var clipCoord = mouseToClip(e.clientX, e.clientY)
     if(clipCoord.x >= -scaleVal && clipCoord.x <= scaleVal
         && clipCoord.y >= -scaleVal && clipCoord.y <= scaleVal
@@ -114,7 +132,6 @@ function render(){
             arrayOfVector[i][0] += ((arrayOfVector[i][0] < 0 ? -1 : 1) * speed)*2.5
             arrayOfVector[i][1] += ((arrayOfVector[i][1] < 0 ? -1 : 1) * speed)*2.5
         }
-
         // rotate about random vector
         var copyOfVector = arrayOfVector[i].slice()
         model = mult(translate(copyOfVector), rotate(arrayOfTheta[i], copyOfVector))
