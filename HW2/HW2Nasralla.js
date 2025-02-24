@@ -1,8 +1,6 @@
 var cubeVertices = []
 var colors = []
-var rotationLoc;
-var translationLoc;
-var scaleLoc;
+var modelViewLoc
 var arrayOfTheta = []
 var arrayOfVector = []
 var speed = 0.05
@@ -41,12 +39,8 @@ window.onload = function init () {
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0)
     gl.enableVertexAttribArray(vColor)
 
-    //rotation
-    rotationLoc = gl.getUniformLocation(program, "rotation")
-    //translation
-    translationLoc = gl.getUniformLocation(program, "translation")
-    //scale
-    scaleLoc = gl.getUniformLocation(program, "scale")
+    //
+    modelViewLoc = gl.getUniformLocation(program, "vModelView")
 
     for(var i = 0; i < 11; i++){
         var mvVector = [0,0,0]
@@ -57,9 +51,6 @@ window.onload = function init () {
         arrayOfTheta.push(0)
         arrayOfVector.push(mvVector)
     }
-
-    console.log(arrayOfVector)
-
     // instantiate
     render()
 }
@@ -70,46 +61,31 @@ function render(){
 
     // draw the center prototype:
     // which does not move or rotate 
-    gl.uniformMatrix4fv(rotationLoc, false, flatten(mat4(
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-    )));
-    gl.uniformMatrix4fv(translationLoc, false, flatten(mat4(
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-    )));    
-    gl.uniformMatrix4fv(scaleLoc, false, flatten(mat4(
+    var scale = mat4(
         0.25, 0, 0, 0,
         0, 0.25, 0, 0,
         0, 0, 0.25, 0,
         0, 0, 0, 1
-    )));
+    );
+    var model = mat4()
+    var modelView = flatten(mult(scale, model))
+
+    gl.uniformMatrix4fv(modelViewLoc, false, modelView)
     gl.drawArrays(gl.TRIANGLES, 0, 100)
 
     for(var i = 1; i < 11; i++){
         arrayOfTheta[i] += 5;
         arrayOfVector[i][0] += (arrayOfVector[i][0] < 0 ? -1 : 1) * speed
         arrayOfVector[i][1] += (arrayOfVector[i][1] < 0 ? -1 : 1) * speed
-        console.log(arrayOfVector[1])
 
         var copyOfVector = arrayOfVector[i].slice()
-        var m = mult(translate(copyOfVector), rotate(arrayOfTheta[i], copyOfVector))
-        m = mult(m, translate(negate(copyOfVector)))
-        gl.uniformMatrix4fv(rotationLoc, false, flatten(m));
+        model = mult(translate(copyOfVector), rotate(arrayOfTheta[i], copyOfVector))
+        model = mult(model, translate(negate(copyOfVector)))
 
-        gl.uniformMatrix4fv(scaleLoc, false, flatten(mat4(
-            0.25, 0, 0, 0,
-            0, 0.25, 0, 0,
-            0, 0, 0.25, 0,
-            0, 0, 0, 1
-        )));
+        modelView = flatten(mult(scale, model))
+        gl.uniformMatrix4fv(modelViewLoc, false, modelView)
+
         gl.drawArrays(gl.TRIANGLES, 0, 50)
-        console.log(arrayOfVector[1])
     }
-    console.log(arrayOfVector[1])
     requestAnimationFrame(render)
 }
