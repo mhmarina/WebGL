@@ -3,7 +3,16 @@ var colors = []
 var modelViewLoc
 var arrayOfTheta = []
 var arrayOfVector = []
-var speed = 0.05
+var speed = 0.01
+
+// Animation variable
+var kft = 0
+const MIN_ANGLE = 0
+const MAX_ANGLE = 360
+
+// UI Variables
+var scaleVal = 0.25
+var numInstances = 10
 
 
 window.onload = function init () {
@@ -43,11 +52,11 @@ window.onload = function init () {
     modelViewLoc = gl.getUniformLocation(program, "vModelView")
 
     // populate vector and theta arrays
-    for(var i = 0; i < 10; i++){
+    for(var i = 0; i < numInstances; i++){
         // create a random vector for each instance
         var mvVector = [0,0,0]
-        mvVector[0] = Math.random() * 2 - 1
-        mvVector[1] = Math.random() * 2 - 1
+        mvVector[0] = Math.random() * 5 - 3
+        mvVector[1] = Math.random() * 3 - 2
         mvVector = normalize(mvVector)
 
         arrayOfTheta.push(0)
@@ -59,16 +68,16 @@ window.onload = function init () {
 
 function render(){
 
-    gl.clear( gl.COLOR_BUFFER_BIT );
+    gl.clear( gl.COLOR_BUFFER_BIT ); 
 
     // draw the center prototype:
     // which does not move or rotate 
     // scale is constant
     // so is the center offset which would be proportional to scale
     scale = mat4(
-        0.25, 0, 0, -0.25/2,
-        0, 0.25, 0, -0.25/2,
-        0, 0, 0.25, 0,
+       scaleVal, 0, 0, -scaleVal/2,
+        0,scaleVal, 0, -scaleVal/2,
+        0, 0,scaleVal, 0,
         0, 0, 0, 1
     )
 
@@ -79,11 +88,11 @@ function render(){
     gl.uniformMatrix4fv(modelViewLoc, false, modelView)
     gl.drawArrays(gl.TRIANGLES, 0, 100)
 
-    for(var i = 0; i < 10; i++){
+    for(var i = 0; i < numInstances; i++){
         // increment theta and position vector
-        arrayOfTheta[i] += 5;
-        arrayOfVector[i][0] += (arrayOfVector[i][0] < 0 ? -1 : 1) * speed
-        arrayOfVector[i][1] += (arrayOfVector[i][1] < 0 ? -1 : 1) * speed
+        arrayOfTheta[i] += (kft * 360)/1.5;
+        arrayOfVector[i][0] += ((arrayOfVector[i][0] < 0 ? -1 : 1) * kft)*2.5
+        arrayOfVector[i][1] += ((arrayOfVector[i][1] < 0 ? -1 : 1) * kft)*2.5
 
         // rotate about random vector
         var copyOfVector = arrayOfVector[i].slice()
@@ -93,7 +102,11 @@ function render(){
         // set my modelview matrix and send it to GPU
         modelView = flatten(mult(scale, model))
         gl.uniformMatrix4fv(modelViewLoc, false, modelView)
-        gl.drawArrays(gl.TRIANGLES, 0, 50)
+        gl.drawArrays(gl.TRIANGLES, 0, 100)
+    }
+    // update kft
+    if(kft <= 0){
+        kft += speed
     }
     requestAnimationFrame(render)
 }
