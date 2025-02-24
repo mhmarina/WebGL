@@ -39,10 +39,12 @@ window.onload = function init () {
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0)
     gl.enableVertexAttribArray(vColor)
 
-    //
+    // 
     modelViewLoc = gl.getUniformLocation(program, "vModelView")
 
-    for(var i = 0; i < 11; i++){
+    // populate vector and theta arrays
+    for(var i = 0; i < 10; i++){
+        // create a random vector for each instance
         var mvVector = [0,0,0]
         mvVector[0] = Math.random() * 2 - 1
         mvVector[1] = Math.random() * 2 - 1
@@ -61,30 +63,36 @@ function render(){
 
     // draw the center prototype:
     // which does not move or rotate 
-    var scale = mat4(
-        0.25, 0, 0, 0,
-        0, 0.25, 0, 0,
+    // scale is constant
+    // so is the center offset which would be proportional to scale
+    scale = mat4(
+        0.25, 0, 0, -0.25/2,
+        0, 0.25, 0, -0.25/2,
         0, 0, 0.25, 0,
         0, 0, 0, 1
-    );
+    )
+
+    // this encapsulates my rotation and translation
     var model = mat4()
     var modelView = flatten(mult(scale, model))
 
     gl.uniformMatrix4fv(modelViewLoc, false, modelView)
     gl.drawArrays(gl.TRIANGLES, 0, 100)
 
-    for(var i = 1; i < 11; i++){
+    for(var i = 0; i < 10; i++){
+        // increment theta and position vector
         arrayOfTheta[i] += 5;
         arrayOfVector[i][0] += (arrayOfVector[i][0] < 0 ? -1 : 1) * speed
         arrayOfVector[i][1] += (arrayOfVector[i][1] < 0 ? -1 : 1) * speed
 
+        // rotate about random vector
         var copyOfVector = arrayOfVector[i].slice()
         model = mult(translate(copyOfVector), rotate(arrayOfTheta[i], copyOfVector))
         model = mult(model, translate(negate(copyOfVector)))
 
+        // set my modelview matrix and send it to GPU
         modelView = flatten(mult(scale, model))
         gl.uniformMatrix4fv(modelViewLoc, false, modelView)
-
         gl.drawArrays(gl.TRIANGLES, 0, 50)
     }
     requestAnimationFrame(render)
