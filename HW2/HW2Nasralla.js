@@ -1,9 +1,12 @@
 var cubeVertices = []
 var colors = []
-var thetaLoc;
-var mvVecLoc;
+var rotationLoc;
+var translationLoc;
+var scaleLoc;
 var arrayOfTheta = []
 var arrayOfVector = []
+var speed = 0.05
+
 
 window.onload = function init () {
     // initialize webgl context
@@ -38,10 +41,12 @@ window.onload = function init () {
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0)
     gl.enableVertexAttribArray(vColor)
 
-    //theta
-    thetaLoc = gl.getUniformLocation(program, "theta")
-    //movementVector
-    mvVecLoc = gl.getUniformLocation(program, "mvVector")
+    //rotation
+    rotationLoc = gl.getUniformLocation(program, "rotation")
+    //translation
+    translationLoc = gl.getUniformLocation(program, "translation")
+    //scale
+    scaleLoc = gl.getUniformLocation(program, "scale")
 
     for(var i = 0; i < 11; i++){
         var mvVector = [0,0,0]
@@ -49,9 +54,11 @@ window.onload = function init () {
         mvVector[1] = Math.random() * 2 - 1
         mvVector = normalize(mvVector)
 
-        arrayOfTheta.push([0,0,0])
+        arrayOfTheta.push(0)
         arrayOfVector.push(mvVector)
     }
+
+    console.log(arrayOfVector)
 
     // instantiate
     render()
@@ -63,23 +70,46 @@ function render(){
 
     // draw the center prototype:
     // which does not move or rotate 
-    gl.uniform3fv(thetaLoc, arrayOfTheta[0]);
-    gl.uniform3fv(mvVecLoc, [0,0,0]);
+    gl.uniformMatrix4fv(rotationLoc, false, flatten(mat4(
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    )));
+    gl.uniformMatrix4fv(translationLoc, false, flatten(mat4(
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    )));    
+    gl.uniformMatrix4fv(scaleLoc, false, flatten(mat4(
+        0.25, 0, 0, 0,
+        0, 0.25, 0, 0,
+        0, 0, 0.25, 0,
+        0, 0, 0, 1
+    )));
     gl.drawArrays(gl.TRIANGLES, 0, 100)
 
+    for(var i = 1; i < 11; i++){
+        arrayOfTheta[i] += 5;
+        arrayOfVector[i][0] += (arrayOfVector[i][0] < 0 ? -1 : 1) * speed
+        arrayOfVector[i][1] += (arrayOfVector[i][1] < 0 ? -1 : 1) * speed
+        console.log(arrayOfVector[1])
 
-    for(var i = 1; i < 10; i++){
-        // TODO: make this more dynamic or random:
-        arrayOfTheta[i][0] += 2.0
+        var copyOfVector = arrayOfVector[i].slice()
+        var m = mult(translate(copyOfVector), rotate(arrayOfTheta[i], copyOfVector))
+        m = mult(m, translate(negate(copyOfVector)))
+        gl.uniformMatrix4fv(rotationLoc, false, flatten(m));
 
-        // currently this is exponential
-        // TODO: Figure out if this is okay
-        arrayOfVector[i][0] *= 1.05
-        arrayOfVector[i][1] *= 1.05
-        gl.uniform3fv(thetaLoc, arrayOfTheta[i]);
-        gl.uniform3fv(mvVecLoc, arrayOfVector[i]);
-        gl.drawArrays(gl.TRIANGLES, 0, 100)
+        gl.uniformMatrix4fv(scaleLoc, false, flatten(mat4(
+            0.25, 0, 0, 0,
+            0, 0.25, 0, 0,
+            0, 0, 0.25, 0,
+            0, 0, 0, 1
+        )));
+        gl.drawArrays(gl.TRIANGLES, 0, 50)
+        console.log(arrayOfVector[1])
     }
-
+    console.log(arrayOfVector[1])
     requestAnimationFrame(render)
 }
