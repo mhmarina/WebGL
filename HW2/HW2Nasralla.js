@@ -1,14 +1,12 @@
+var canvas
+
 var cubeVertices = []
 var colors = []
 var modelViewLoc
 var arrayOfTheta = []
 var arrayOfVector = []
 var speed = 0.01
-
-// Animation variable
-var kft = 0
-const MIN_ANGLE = 0
-const MAX_ANGLE = 360
+var isMoving = true
 
 // UI Variables
 var scaleVal = 0.25
@@ -62,8 +60,28 @@ window.onload = function init () {
         arrayOfTheta.push(0)
         arrayOfVector.push(mvVector)
     }
+
+    canvas.addEventListener('click', (e) => toggleAnimation(e))
+
     // instantiate
     render()
+}
+
+function toggleAnimation(e){
+    var clipCoord = mouseToClip(e.clientX, e.clientY)
+    if(clipCoord.x >= -scaleVal && clipCoord.x <= scaleVal
+        && clipCoord.y >= -scaleVal && clipCoord.y <= scaleVal
+     ){
+        isMoving = !isMoving
+     }
+}
+
+// utility to convert from mouse to clip coordinates:
+function mouseToClip(mouseX, mouseY){
+    const rect = canvas.getBoundingClientRect();
+    var x = ((mouseX - canvas.offsetLeft) - rect.width / 2) / (rect.width / 2)
+    var y = (-(mouseY - canvas.offsetTop)  + rect.height / 2) / (rect.height / 2)
+    return {x, y}
 }
 
 function render(){
@@ -90,23 +108,20 @@ function render(){
 
     for(var i = 0; i < numInstances; i++){
         // increment theta and position vector
-        arrayOfTheta[i] += (kft * 360)/1.5;
-        arrayOfVector[i][0] += ((arrayOfVector[i][0] < 0 ? -1 : 1) * kft)*2.5
-        arrayOfVector[i][1] += ((arrayOfVector[i][1] < 0 ? -1 : 1) * kft)*2.5
-
+        if(isMoving){
+            arrayOfTheta[i] += (speed * 360)/1.5;
+            arrayOfVector[i][0] += ((arrayOfVector[i][0] < 0 ? -1 : 1) * speed)*2.5
+            arrayOfVector[i][1] += ((arrayOfVector[i][1] < 0 ? -1 : 1) * speed)*2.5
+        }
+        
         // rotate about random vector
         var copyOfVector = arrayOfVector[i].slice()
         model = mult(translate(copyOfVector), rotate(arrayOfTheta[i], copyOfVector))
         model = mult(model, translate(negate(copyOfVector)))
-
         // set my modelview matrix and send it to GPU
         modelView = flatten(mult(scale, model))
         gl.uniformMatrix4fv(modelViewLoc, false, modelView)
         gl.drawArrays(gl.TRIANGLES, 0, 100)
-    }
-    // update kft
-    if(kft <= 0){
-        kft += speed
-    }
+    }    
     requestAnimationFrame(render)
 }
