@@ -7,6 +7,7 @@ var arrayOfTheta = []
 var arrayOfVector = []
 var speed = 0.01
 var isMoving = true
+kft = 0
 
 // UI Variables
 var scaleVal = 0.25
@@ -104,7 +105,7 @@ function render(){
     var modelView = flatten(mult(scale, model))
 
     gl.uniformMatrix4fv(modelViewLoc, false, modelView)
-    gl.drawArrays(gl.TRIANGLES, 0, 100)
+    gl.drawArrays(gl.TRIANGLES, 0, 60)
 
     for(var i = 0; i < numInstances; i++){
         // increment theta and position vector
@@ -113,7 +114,7 @@ function render(){
             arrayOfVector[i][0] += ((arrayOfVector[i][0] < 0 ? -1 : 1) * speed)*2.5
             arrayOfVector[i][1] += ((arrayOfVector[i][1] < 0 ? -1 : 1) * speed)*2.5
         }
-        
+
         // rotate about random vector
         var copyOfVector = arrayOfVector[i].slice()
         model = mult(translate(copyOfVector), rotate(arrayOfTheta[i], copyOfVector))
@@ -121,7 +122,7 @@ function render(){
         // set my modelview matrix and send it to GPU
         modelView = flatten(mult(scale, model))
         gl.uniformMatrix4fv(modelViewLoc, false, modelView)
-        gl.drawArrays(gl.TRIANGLES, 0, 100)
+        gl.drawArrays(gl.TRIANGLES, 0, 60)
     }    
     requestAnimationFrame(render)
 }
