@@ -5,20 +5,20 @@ var colors = []
 var modelViewLoc
 var arrayOfTheta = []
 var arrayOfVector = []
-var speed = 0.01
 var isMoving = true
 kft = 0
 
 // UI Variables
 var scaleVal = 0.25
 var numInstances = 10
-
+var speed = 0.01
 
 window.onload = function init () {
     // initialize webgl context
     canvas = document.getElementById("gl-canvas")
-    var numObjSlider = document.getElementById("numObj-slider")
-    var scaleSlider = document.getElementById("scale-slider")
+    numObjSlider = document.getElementById("numObj-slider")
+    scaleSlider = document.getElementById("scale-slider")
+    speedSlider = document.getElementById("speed-slider")
 
     gl = WebGLUtils.setupWebGL(canvas)
     if(!gl){ alert("WebGl is not available. :(")}
@@ -54,15 +54,16 @@ window.onload = function init () {
     initializeArrays()
     modelViewLoc = gl.getUniformLocation(program, "vModelView")
 
-    // TODO: Figure out this shit
     canvas.addEventListener('click', (e) => toggleAnimation(e))
     numObjSlider.addEventListener('change', (e)=>{
         numInstances = numObjSlider.value
         initializeArrays()
     })
-    // I would have to re-populate arrays for this
     scaleSlider.addEventListener('change', (e)=>{
         scaleVal = scaleSlider.value
+    })
+    speedSlider.addEventListener('change', (e) => {
+        speed = speedSlider.value
     })
 
     // instantiate
@@ -71,6 +72,8 @@ window.onload = function init () {
 
 function initializeArrays(){
     isMoving = false
+    arrayOfTheta = []
+    arrayOfVector = []
     // populate vector and theta arrays
     for(var i = 0; i < numInstances; i++){
         // create a random vector for each instance
