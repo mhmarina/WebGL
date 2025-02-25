@@ -1,12 +1,17 @@
 var canvas
-
 var cubeVertices = []
 var colors = []
 var modelViewLoc
 var arrayOfTheta = []
 var arrayOfVector = []
+let initialVectors = [[]]
+
+// animation
+var kft = 0.0
+var kftDelta = 0.05
+var deltaTime = 0.0
+var lastDelta = 0.0
 var isMoving = true
-kft = 0
 
 // UI Variables
 var scaleVal = 0.25
@@ -14,6 +19,7 @@ var numInstances = 10
 var speed = 0.01
 
 window.onload = function init () {
+
     // initialize webgl context
     canvas = document.getElementById("gl-canvas")
     numObjSlider = document.getElementById("numObj-slider")
@@ -72,24 +78,23 @@ window.onload = function init () {
 
 function initializeArrays(){
     isMoving = false
+    kft = 0.0
     arrayOfTheta = []
     arrayOfVector = []
     // populate vector and theta arrays
     for(var i = 0; i < numInstances; i++){
         // create a random vector for each instance
         var mvVector = [0,0,0]
-        mvVector[0] = Math.random() * 5 - 3
-        mvVector[1] = Math.random() * 3 - 2
+        mvVector[0] = Math.random() * (3) - 1
+        mvVector[1] = Math.random() * (3) - 1
         mvVector = normalize(mvVector)
         arrayOfTheta.push(0)
         arrayOfVector.push(mvVector)
     }
+    isMoving = true
 }
 
 function toggleAnimation(e){
-    // TODO: on click when all instances are off the screen,
-    // reinstantiate them
-
     var clipCoord = mouseToClip(e.clientX, e.clientY)
     if(clipCoord.x >= -scaleVal && clipCoord.x <= scaleVal
         && clipCoord.y >= -scaleVal && clipCoord.y <= scaleVal
@@ -107,9 +112,11 @@ function mouseToClip(mouseX, mouseY){
 }
 
 function render(){
-
     gl.clear( gl.COLOR_BUFFER_BIT ); 
 
+    if(isMoving){
+        deltaTime = deltaTime + 1
+    } 
     // draw the center prototype:
     // which does not move or rotate 
     // scale is constant
@@ -143,6 +150,18 @@ function render(){
         modelView = flatten(mult(scale, model))
         gl.uniformMatrix4fv(modelViewLoc, false, modelView)
         gl.drawArrays(gl.TRIANGLES, 0, 60)
-    }    
+
+        // kft is used to make sure the animation loops
+        // deltatime is to make sure the animation is as framerate independent as possible
+        // for some reason, the more instances the faster the framerate was
+        // (weird when it should be the opposite?)
+        if(isMoving){
+            kft = kft + (speed * kftDelta) * ((deltaTime - lastDelta)/250)
+            if(kft > 1.0){
+                lastDelta = deltaTime 
+                initializeArrays()
+            }
+        }
+    }  
     requestAnimationFrame(render)
 }

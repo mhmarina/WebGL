@@ -74,7 +74,6 @@ function triad(a, b, c, d, e){
 
 function quad(a, b, c, d) 
 {
-
     // We need to parition the quad into two triangles in order for
     // WebGL to be able to render it.  In this case, we create two
     // triangles from the quad indices
