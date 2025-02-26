@@ -1,3 +1,5 @@
+// Marina Nasralla
+
 var canvas
 var cubeVertices = []
 var colors = []
@@ -62,14 +64,14 @@ window.onload = function init () {
 
     canvas.addEventListener('click', (e) => toggleAnimation(e))
     numObjSlider.addEventListener('change', (e)=>{
-        numInstances = parseInt(numObjSlider.value)
+        numInstances = numObjSlider.value
         initializeArrays()
     })
     scaleSlider.addEventListener('change', (e)=>{
-        scaleVal = parseFloat(scaleSlider.value)
+        scaleVal = scaleSlider.value
     })
     speedSlider.addEventListener('change', (e) => {
-        speed = parseFloat(speedSlider.value)
+        speed = speedSlider.value
     })
 
     // instantiate
@@ -87,15 +89,10 @@ function initializeArrays(){
         var mvVector = [0,0,0]
         mvVector[0] = Math.random() * (3) - 1
         mvVector[1] = Math.random() * (3) - 1
-        mvVector[2] = Math.random() * (3) - 1
         mvVector = normalize(mvVector)
         arrayOfTheta.push(0)
         arrayOfVector.push(mvVector)
     }
-    // console.log(arrayOfVector)
-    // norm = normalize(arrayOfVector[0])
-    // //newvec = norm.map((v)=>v*2)
-    // //console.log(newvec)
     isMoving = true
 }
 
@@ -144,10 +141,8 @@ function render(){
         // increment theta and position vector
         if(isMoving){
             arrayOfTheta[i] += (speed * 360)/1.5;
-            // arrayOfVector[i][0] += ((arrayOfVector[i][0] < 0 ? -1 : 1) * speed)*2.5
-            // arrayOfVector[i][1] += ((arrayOfVector[i][1] < 0 ? -1 : 1) * speed)*2.5
-            arrayOfVector[i] = normalize(arrayOfVector[i])
-            arrayOfVector[i] = arrayOfVector[i].map((v)=>{console.log(v, (1+(kft*speed))); return v*(speed+kft)*20})
+            arrayOfVector[i][0] += ((arrayOfVector[i][0] < 0 ? -1 : 1) * speed)*2.5
+            arrayOfVector[i][1] += ((arrayOfVector[i][1] < 0 ? -1 : 1) * speed)*2.5
         }
         // rotate about random vector
         var copyOfVector = arrayOfVector[i].slice()
@@ -163,7 +158,7 @@ function render(){
         // for some reason, the more instances the faster the framerate was
         // (weird when it should be the opposite?)
         if(isMoving){
-            kft = kft + (speed * kftDelta) * ((deltaTime - lastDelta)/100)
+            kft = kft + (speed * kftDelta) * ((deltaTime - lastDelta)/250)
             if(kft > 1.0){
                 lastDelta = deltaTime 
                 initializeArrays()
