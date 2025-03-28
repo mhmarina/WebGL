@@ -1,0 +1,116 @@
+<!-- Marina Nasralla
+4/1/2025 -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- straight up copied from shadedSphere2.html -->
+        <script id="vertex-shader" type="x-shader/x-vertex">
+
+            attribute vec3 vPosition;
+            attribute vec3 vNormal;
+            
+            uniform mat4 modelViewMatrix;
+            uniform mat4 projectionMatrix;
+            uniform vec4 lightPosition;
+            
+            varying vec3 N;
+            varying vec3 L;
+            varying vec3 E;
+            
+            void main()
+            {
+                vec4 pos4D = vec4(vPosition, 1.0);
+                vec4 nor4D = vec4(vNormal, 0.0); 
+                vec3 pos = (modelViewMatrix * pos4D).xyz;
+                vec3 light = lightPosition.xyz;
+                L = normalize( light - pos );
+                vec3 eyePoint = vec3(0.0, 0.0, 0.0);
+                E = normalize( eyePoint - pos );
+                N = normalize( (modelViewMatrix * nor4D).xyz); 
+                gl_Position = projectionMatrix * modelViewMatrix * pos4D;    
+            }
+        </script>
+            
+        <script id="fragment-shader" type="x-shader/x-fragment">
+            precision mediump float;
+            
+            uniform vec4 ambientProduct;
+            uniform vec4 diffuseProduct;
+            uniform vec4 specularProduct;
+            uniform float shininess;
+            varying vec3 N;
+            varying vec3 L;
+            varying vec3 E;
+            
+            void main()
+            {    
+                vec4 fColor;
+                vec3 unitN = normalize(N);
+                vec3 unitL = normalize(L);
+                vec3 unitE = normalize(E);
+                vec3 H = normalize( unitL + unitE );
+                vec4 ambient = ambientProduct;
+                float LNdotProduct = dot(unitL, unitN);
+                float Kd = max( LNdotProduct, 0.0 );
+                vec4  diffuse = Kd*diffuseProduct;
+                float Ks = pow( max(dot(unitN, H), 0.0), shininess );
+                vec4  specular = Ks * specularProduct;
+                    
+                if( LNdotProduct < 0.0 ) 
+                    specular = vec4(0.0, 0.0, 0.0, 1.0);
+                        
+                vec4 finalColor = ambient + diffuse + specular;
+                
+                fColor = finalColor;
+                fColor.a = 1.0;
+
+                gl_FragColor = fColor;
+            }
+        </script> 
+        
+        <script type="text/javascript" src="Common/webgl-utils.js"></script>
+        <script type="text/javascript" src="Common/initShaders.js"></script>
+        <script type="text/javascript" src="Common/MV.js"></script>
+        <script type="text/javascript" src="Nasralla_geometry.js"></script>
+        <script type="text/javascript" src="Nasralla_hw3.js"></script>
+        <script type="text/javascript" src="mouseControl.js"></script>
+        
+    </head>
+    <body>
+        <div style="display: flex; flex-direction: row; gap: 10px;">
+            <canvas id="gl-canvas" width="512" height="512" style="border:2px solid #000000;">
+                Oops ... your browser doesn't support the HTML5 canvas element
+            </canvas>  
+            <div>
+                <h2>Name: Marina Nasralla
+                    <br>
+                    Date: 4/1/2025
+                </h2>
+                <h2> Program Description:</h2>
+                <p>lorem ipsum</p>
+                <h2>Resources Used:</h2>
+                <p>lorem ipsum</p>
+            </div>
+        </div>
+        <h1>Surface Options</h1>       
+        <label for="shape">Shape</label>
+        <select name="shape" id="shape-select">
+            <option>Cylinder</option>
+            <option>Crazy Curly Sine</option>
+        </select>
+        <label for="material">Shape</label>
+        <select name="material" id="material-select">
+            <option>Bronze</option>
+            <option>Gold</option>
+        </select>
+        <label for="light">Light</label>
+        <select name="light" id="light-select">
+            <option>Stationary</option>
+            <option>Rotating about SOR</option>
+        </select>
+        <label for="shiny">Shininess</label>
+        <input id="shiny-slider" name="shiny" type="range" min="1" max="1000" step="10" value="500" />
+        <label for="fov">FOV</label>
+        <input id="fov-slider" name="fov" type="range" min="10" max="100" step="1" value="60"/>
+    </body>
+</html>
