@@ -1,5 +1,3 @@
-
-
 // mouse interaction
  
 var mouse =
