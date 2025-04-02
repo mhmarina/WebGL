@@ -53,8 +53,6 @@ var modelViewMatrix, projectionMatrix;
 var modelViewMatrixLoc, projectionMatrixLoc;
 
 window.onload = function init() {
-    generatePoints(Cylinder, -1, 1, 0.05, radians(20))    
-
     canvas = document.getElementById( "gl-canvas" );
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
@@ -66,7 +64,7 @@ window.onload = function init() {
     program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
-    resetBuffer()
+    resetBuffer(Cylinder)
     
     modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
     projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
@@ -81,8 +79,7 @@ window.onload = function init() {
         let fn
         if(shapeSel.value == "Cylinder"){fn = Cylinder}
         else{fn = SOR}
-        generatePoints(fn, -1, 1, 0.05, radians(20))
-        resetBuffer()
+        resetBuffer(fn)
     })
 
 	mouseControls();
@@ -90,7 +87,9 @@ window.onload = function init() {
 }
 
 // I want to reset all buffers when changing shapes 
-function resetBuffer(){
+function resetBuffer(fn){
+    generatePoints(fn, -1, 1, 0.05, radians(20))
+
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
@@ -107,7 +106,9 @@ function render() {
     modelViewMatrix = lookAt(vec3(viewer.eye), viewer.at, viewer.up);
 	       
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix) );
-    gl.drawArrays(gl.POINTS, 0, points.length);
+    // gl.drawArrays(gl.LINE_LOOP, 0, points.length);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, points.length);
+    // gl.drawArrays(gl.POINTS, 0, points.length);
 
     window.requestAnimFrame(render);
 }
