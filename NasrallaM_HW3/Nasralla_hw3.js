@@ -8,7 +8,7 @@ var viewer =
 	up:  vec3(0.0, 1.0, 0.0),
 	
 	// for moving around object; set vals so at origin
-	radius: 3,
+	radius: 3.0,
     theta: 0,
     phi: 0
 };
@@ -73,7 +73,7 @@ window.onload = function init() {
     modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
     projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
 
-    projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+    projectionMatrix = perspective(60, 1, near, far)
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix) );
  
     // UI
@@ -103,9 +103,17 @@ window.onload = function init() {
     })
 
     shinySlide = document.getElementById("shiny-slider")
-    shinySlide.addEventListener('change', ()=>{
+    shinySlide.addEventListener('input', ()=>{
         gl.uniform1f( gl.getUniformLocation(program, 
             "shininess"), material.materialShininess * parseInt(shinySlide.value)) 
+    })
+
+    fovSlide = document.getElementById("fov-slider")
+    fovSlide.addEventListener('input', ()=>{
+        var fov = parseInt(fovSlide.value)
+        projectionMatrix = perspective(fov, 1, near, far)
+        // projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix) );    
     })
 
 	mouseControls();
