@@ -30,16 +30,29 @@ var lightPosition = vec4(3.0, 3.0, 5, 1.0 );
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
-// materials (gold)
-var materialAmbient = vec4( 1.0, 0.0, 1.0, 1.0 );
-var materialDiffuse = vec4( 1.0, 0.8, 0.0, 1.0 );
-var materialSpecular = vec4( 1.0, 0.8, 0.0, 1.0 );
-var materialShininess = 100.0;
+
+let material
+// materials
+pearl = {
+    materialAmbient: vec4( 0.25, 0.20725, 0.20725, 1.0 ),
+    materialDiffuse: vec4( 1, 0.829, 0.829, 1.0 ),
+    materialSpecular: vec4( 0.296648, 0.296648, 0.296648, 1.0 ),
+    materialShininess: 8.8
+}
+gold = {
+    materialAmbient: vec4( 1.0, 0.0, 1.0, 1.0 ),
+    materialDiffuse: vec4( 1.0, 0.8, 0.0, 1.0 ),
+    materialSpecular: vec4( 1.0, 0.8, 0.0, 1.0 ),
+    materialShininess: 100.0
+}
+plastic = {
+    materialAmbient: vec4( 0, 0.0, 0, 1.0 ),
+    materialDiffuse: vec4( 0.01, 0.01, 0.01, 1.0 ),
+    materialSpecular: vec4( 0.5, 0.5, 0.5, 1.0 ),
+    materialShininess: 25
+}
 
 var ambientColor, diffuseColor, specularColor;
-
-function SOR(x){return Math.sin(x) + (1/2)*Math.sin(6*x)}
-function Cylinder(x){return 1}
 
 window.onload = function init() {
     canvas = document.getElementById( "gl-canvas" );
@@ -53,17 +66,56 @@ window.onload = function init() {
     program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
-    ambientProduct = mult(lightAmbient, materialAmbient);
-    diffuseProduct = mult(lightDiffuse, materialDiffuse);
-    specularProduct = mult(lightSpecular, materialSpecular);
-
-    resetBuffer(Cylinder)
+    resetBuffer(cylinder)
+    material = gold
+    setMaterial(gold)
     
     modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
     projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
 
     projectionMatrix = ortho(left, right, bottom, ytop, near, far);
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix) );
+ 
+    // UI
+    shapeSel = document.getElementById("shape-select")
+    shapeSel.addEventListener('change', () =>{
+        let fn
+        switch(shapeSel.value){
+            case("Cylinder"): {fn = cylinder} break
+            case("SOR"): {fn = sor} break
+            case("Shawarma"): {fn = shawarma} break
+            default: fn = cylinder
+        }
+        resetBuffer(fn)
+    })
+
+    materialSel = document.getElementById("material-select")
+    materialSel.addEventListener('change', ()=>{
+        let mat
+        switch(materialSel.value){
+            case("Gold"): {mat = gold} break
+            case("Pearl"): {mat = pearl} break
+            case("Plastic"): {mat = plastic} break
+            default: mat = gold
+        }
+        material = mat
+        setMaterial(mat)
+    })
+
+    shinySlide = document.getElementById("shiny-slider")
+    shinySlide.addEventListener('change', ()=>{
+        gl.uniform1f( gl.getUniformLocation(program, 
+            "shininess"), material.materialShininess * parseInt(shinySlide.value)) 
+    })
+
+	mouseControls();
+    render()
+}
+
+function setMaterial(material){
+    ambientProduct = mult(lightAmbient, material.materialAmbient);
+    diffuseProduct = mult(lightDiffuse, material.materialDiffuse);
+    specularProduct = mult(lightSpecular, material.materialSpecular);
 
     gl.uniform4fv( gl.getUniformLocation(program, 
         "ambientProduct"),flatten(ambientProduct) );
@@ -74,25 +126,15 @@ window.onload = function init() {
      gl.uniform4fv( gl.getUniformLocation(program, 
         "lightPosition"),flatten(lightPosition) );
      gl.uniform1f( gl.getUniformLocation(program, 
-        "shininess"),materialShininess );
- 
-    // UI
-    shapeSel = document.getElementById("shape-select")
-    shapeSel.addEventListener('change', () =>{
-        let fn
-        if(shapeSel.value == "Cylinder"){fn = Cylinder}
-        else{fn = SOR}
-        resetBuffer(fn)
-    })
+        "shininess"), material.materialShininess );
 
-	mouseControls();
-    render()
+    shinySlide = document.getElementById("shiny-slider")
+    shinySlide.value = '1'
 }
 
 // I want to reset all buffers when changing shapes 
 function resetBuffer(fn){
-    generatePoints(fn, -1, 1, 0.05, radians(20))
-    generateIndices(radians(20))
+    generatePoints(fn, -1, 1, 0.01, radians(10))
 
     // elements buffer
     var iBuffer = gl.createBuffer()

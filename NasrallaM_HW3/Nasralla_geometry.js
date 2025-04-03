@@ -1,6 +1,17 @@
 // Marina Nasralla
 // 4/9/25
 
+function SOR(t){return Math.sin(t) + (1/2)*Math.sin(6*t)}
+function SOR_dt(t){return 3 * Math.cos(t) + Math.cos(6*t)}
+function Cylinder(t){return 1}
+function Cylinder_dt(t){return 0}
+function Shawarma(t){return Math.sin((1/7)*t) + (1/2) * Math.sin(12*t)}
+function Shawarma_dt(t){return 6*Math.cos(12*t) + (1/7) * Math.cos((1/7)*t)}
+
+let sor = [SOR, SOR_dt]
+let cylinder = [Cylinder, Cylinder_dt]
+let shawarma = [Shawarma, Shawarma_dt]
+ 
 points = []
 indices = []
 normals = []
@@ -21,13 +32,21 @@ function generatePoints(f, a, b, stepT, stepTheta){
         for(theta = 0; theta <= radians(360); theta += stepTheta){
             // rotate about y
             // we know that z is 0 in f(t) so we'll just use the x component
-            x = f(t) * Math.cos(theta)
+            x = f[0](t) * Math.cos(theta)
             y = t
-            z = f(t) * -Math.sin(theta)
+            z = f[0](t) * -Math.sin(theta)
             points.push(vec3(x,y,z))
-            normals.push(vec3(x,y,z))
+            
+            dt = normalize(vec3(f[1](t)*Math.cos(theta), 1, f[1](t)*-Math.sin(theta)))
+            dtheta = normalize(vec3(f[0](t)*-Math.sin(theta), 0, f[0](t)*Math.cos(theta)))
+            normal = normalize(cross(dtheta, dt))
+            normals.push(normal)
+            // TODO: probably could just do this by hand
+            // TODO: maybe create a datastructure that holds the function, the function's derivate w/respect to theta, and t
         }
     }
+
+    generateIndices(stepTheta)
 }
 
 // triangulation
