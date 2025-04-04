@@ -1,5 +1,5 @@
 <!-- Marina Nasralla
-4/1/2025 -->
+4/4/2025 -->
 <!DOCTYPE html>
 <html>
     <head>
@@ -18,35 +18,22 @@
 
             void main()
             {
-
                 // make inputs 4d to match 4x4 transformation matrix
                 vec4 pos4D = vec4(vPosition, 1.0);
                 vec4 nor4D = vec4(vNormal, 0.0); 
-                
                 // map position into eye coordinates
                 vec3 pos = (modelViewMatrix * pos4D).xyz;
-                
                 // light defined  in eye coordinates
                 vec3 light = lightPosition.xyz;
-                
                 // light vector
                 L = normalize( light - pos );
-                
                 // eye in eye coordinates
                 vec3 eyePoint = vec3(0.0, 0.0, 0.0);
-                
-                // view vector
-                // this was an error - redeclaring E, so not varying
                 E = normalize( eyePoint - pos );
-            
-            // map normal into eye coordinates
-            // normal matrix should not be needed here bc it is a rotation and translation (rigid body)
                 N = normalize( (modelViewMatrix * nor4D).xyz); 
                 
                 // output point in clip coordinates
                 gl_Position = projectionMatrix * modelViewMatrix * pos4D;
-                
-                
             }
         </script>
             
@@ -64,9 +51,6 @@
             void main()
             {    
                 vec4 fColor;
-                
-                // normalize the input vectors that have been
-                // interpolated across the triangle
                 
                 vec3 unitN = normalize(N);
                 vec3 unitL = normalize(L);
@@ -91,14 +75,8 @@
                 if( LNdotProduct < 0.0 ) 
                     specular = vec4(0.0, 0.0, 0.0, 1.0);
                      
-                // create working color 
-                // so we can play before loading into fColor
-                vec4 finalColor = ambient + diffuse + specular;
-                
-                fColor = finalColor;
+                fColor = ambient + diffuse + specular;
                 fColor.a = 1.0;
-                 
-            
                 gl_FragColor = fColor;
             }            
         </script> 
@@ -119,10 +97,16 @@
             <div>
                 <h2>Name: Marina Nasralla
                     <br>
-                    Date: 4/2025
+                    Date: 4/4/2025
                 </h2>
                 <h2> Program Description:</h2>
-                <p>lorem ipsum</p>
+                <p style="width: 75%;">
+                    This program has a choice of 3 shapes: Cylinder, SOR, and Shawarma. The 3 shapes are created by plotting a set of points from a discrete domain in a parametric equation. 
+                    <br>
+                    This program also has a choice of 3 materials: gold, pearl and plastic. These materials each have different ambiance, specular and diffuse properties that allow them to interact uniquely with the light source, using phong shading.
+                    <br>
+                    The program gives the option of having stationary light or light that revolves around your shape, and it also has sliders to change the FOV and shininess values.
+                </p>
                 <h2>Resources Used:</h2>
                 <ul>
                     <li><a href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawElements.xhtml">drawElements (OpenGL)</a></li>

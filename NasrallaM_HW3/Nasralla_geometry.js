@@ -1,5 +1,5 @@
 // Marina Nasralla
-// 4/9/25
+// 4/4/25
 
 // functions and their derivatives
 function SOR(t){return Math.sin(t) + (1/2)*Math.sin(6*t)}

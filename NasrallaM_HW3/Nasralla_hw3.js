@@ -1,5 +1,5 @@
 // Marina Nasralla
-// 4/9/25
+// 4/4/25
 var program
 var viewer = 
 {
@@ -55,6 +55,9 @@ plastic = {
 
 var ambientColor, diffuseColor, specularColor;
 
+console.log(`eye: ${viewer.eye}, at: ${viewer.at}, up: ${viewer.up}`)
+console.log(`initial light position: ${lightPosition}`)
+
 window.onload = function init() {
     canvas = document.getElementById( "gl-canvas" );
     gl = WebGLUtils.setupWebGL( canvas );
@@ -74,6 +77,7 @@ window.onload = function init() {
     projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
 
     projectionMatrix = perspective(60, 1, near, far)
+    console.log(`initial perspective fov: 60, near: ${near}, far: ${far}`)
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix) );
  
     // UI
@@ -178,6 +182,8 @@ function resetBuffer(fn){
     var vNormal = gl.getAttribLocation( program, "vNormal" );
     gl.vertexAttribPointer( vNormal, 3, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vNormal);
+
+    console.log(`minmax box: left: ${left}, right: ${right}, top: ${ytop}, bottom: ${bottom}, near: ${near}, far: ${far}`)
 }
 
 function render() {

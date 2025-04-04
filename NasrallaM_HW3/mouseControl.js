@@ -1,5 +1,4 @@
 // mouse interaction
- 
 var mouse =
 {
 	// keep last location to compare with new location
