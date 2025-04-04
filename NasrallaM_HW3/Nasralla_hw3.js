@@ -30,8 +30,9 @@ var lightPosition = vec4(3.0, 3.0, 5, 1.0 );
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+var isLightMoving = false
 
-let material
+let currMaterial
 // materials
 pearl = {
     materialAmbient: vec4( 0.25, 0.20725, 0.20725, 1.0 ),
@@ -67,7 +68,6 @@ window.onload = function init() {
     gl.useProgram( program );
 
     resetBuffer(cylinder)
-    material = gold
     setMaterial(gold)
     
     modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
@@ -98,14 +98,13 @@ window.onload = function init() {
             case("Plastic"): {mat = plastic} break
             default: mat = gold
         }
-        material = mat
         setMaterial(mat)
     })
 
     shinySlide = document.getElementById("shiny-slider")
     shinySlide.addEventListener('input', ()=>{
         gl.uniform1f( gl.getUniformLocation(program, 
-            "shininess"), material.materialShininess * parseInt(shinySlide.value)) 
+            "shininess"), currMaterial.materialShininess * parseInt(shinySlide.value)) 
     })
 
     fovSlide = document.getElementById("fov-slider")
@@ -116,11 +115,23 @@ window.onload = function init() {
         gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix) );    
     })
 
+    lightSel = document.getElementById("light-select")
+    lightSel.addEventListener('change', ()=>{
+        switch(lightSel.value){
+            case("Stationary"): 
+                isLightMoving = false
+                gl.uniform4fv( gl.getUniformLocation(program, 
+                    "lightPosition"),flatten(lightPosition));
+                break
+            default:
+                isLightMoving = true;            
+        }
+    })
 	mouseControls();
     render()
 }
 
-function setMaterial(material){
+function setMaterial(material){    
     ambientProduct = mult(lightAmbient, material.materialAmbient);
     diffuseProduct = mult(lightDiffuse, material.materialDiffuse);
     specularProduct = mult(lightSpecular, material.materialSpecular);
@@ -131,13 +142,14 @@ function setMaterial(material){
         "diffuseProduct"),flatten(diffuseProduct) );
      gl.uniform4fv( gl.getUniformLocation(program, 
         "specularProduct"),flatten(specularProduct) );	
-     gl.uniform4fv( gl.getUniformLocation(program, 
-        "lightPosition"),flatten(lightPosition) );
      gl.uniform1f( gl.getUniformLocation(program, 
         "shininess"), material.materialShininess );
-
+    gl.uniform4fv( gl.getUniformLocation(program, 
+        "lightPosition"),flatten(lightPosition));
+    
     shinySlide = document.getElementById("shiny-slider")
-    shinySlide.value = '1'
+    shinySlide.value = '1' // reset shininess in UI
+    currMaterial = material
 }
 
 // I want to reset all buffers when changing shapes 
@@ -149,6 +161,7 @@ function resetBuffer(fn){
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer)
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(flatten(indices)), gl.STATIC_DRAW);
 
+    // vertex positions
     var vBuffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer)
     gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW)
@@ -157,6 +170,7 @@ function resetBuffer(fn){
     gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0)
     gl.enableVertexAttribArray(vPosition)
 
+    // normals
     var nBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer);
     gl.bufferData( gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW );
@@ -169,15 +183,25 @@ function resetBuffer(fn){
 function render() {
     
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    
+    //animate light
+    if(isLightMoving){
+        animateLight(0.03)
+    }
     modelViewMatrix = lookAt(vec3(viewer.eye), viewer.at, viewer.up);
-	       
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix) );
-    // gl.drawArrays(gl.LINE_LOOP, 0, points.length);
-    // gl.drawArrays(gl.TRIANGLE_STRIP, 0, points.length);
-    // TODO: use draw elements
-    // example: cubev -- cuberotating tris elements
     gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 
     window.requestAnimFrame(render);
+}
+
+var angle = 10
+function animateLight(speed){
+    var lx = lightPosition[0] * Math.cos(angle)
+    var ly = lightPosition[1]
+    var lz = lightPosition[2] * -Math.sin(angle)
+
+    //lightPosition = new vec4(lx, ly, lz, 1.0)
+    gl.uniform4fv( gl.getUniformLocation(program, 
+        "lightPosition"),flatten(new vec4(lx, ly, lz, 1.0)) );
+    angle += speed
 }
