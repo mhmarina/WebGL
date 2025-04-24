@@ -196,7 +196,6 @@ function render() {
     modelViewMatrix = lookAt(vec3(viewer.eye), viewer.at, viewer.up);
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix) );
     gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
-
     window.requestAnimFrame(render);
 }
 
