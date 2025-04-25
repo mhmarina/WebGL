@@ -53,7 +53,7 @@ var buttHeight = 1.6
 var chestWidth = 2.5
 var buttWidth = 2.8
 var tailHeight = 1
-var legHeight = 1.75
+var legHeight = 2
 var legWidth = 0.5
 var earHeight = 0.5
 var earDepth = 0.5 // also equal to leg depth
@@ -66,7 +66,8 @@ var eyeDepth = 0.3
 
 // rotations I guess reflect where the fixed points are
 // the angles are relative to their parents
-var theta = [10, 320, 180, 180, 130, 130, 0, 0, 0, 0, 0, 0, 330]
+// with this butt translation: m = mult(m, translate(-0.5, -0.6, 0)) 
+var theta = [1, 0, 210, 150, 210, 150, 0, 0, 0, 0, 0, 0, 310] // standing pose, tail to the right, first frame in walk cycle
 
 // helper functions
 function scale4(a, b, c) {
@@ -80,9 +81,11 @@ function scale4(a, b, c) {
  // node contains world transform matrix for instance, render function
  // one sibling and one child, or I guess we can store an array of children
  // in OG example, the torso has 4 children (2 arms, 2 legs, I wonder how theyre stored)
- function createNode(transform, render, sibling, child){
+ function createNode(transform, translate, rotate, render, sibling, child){
     var node = {
     transform: transform,
+    translate: translate,
+    rotate: rotate,
     render: render,
     sibling: sibling,
     child: child,
@@ -93,73 +96,82 @@ function scale4(a, b, c) {
 function initNodes(ID){
     // initial modelview matrix
     var m = mat4()
+    var trans = mat4()
+    var rot = mat4()
     switch(ID){
         case(chestID):
             // rotate(angle, theta)
             m = rotate(theta[ID], 0, 1, 0)
-            figure[ID] = createNode( m, chest, null, buttID)
+            figure[ID] = createNode( m, trans, m, chest, null, buttID)
             break
         case(buttID):
-            m = translate(chestWidth+0.15, -(chestHeight/2 - buttHeight/2), 0)
-            m = mult(m, translate(-0.5, -0.6, 0)) // sitting down pose
-            m = mult(m, rotate(theta[ID], 0, 0, 1))
-            figure[ID] = createNode(m, butt, headID, tailID)
+            trans = translate(chestWidth-0.15, -(chestHeight/2 - buttHeight/2), 0)
+            rot = rotate(theta[ID], 0, 0, 1)
+            m = mult(trans, rot)
+            figure[ID] = createNode(m, trans, rot, butt, headID, tailID)
             break
         case(tailID):
-            m = translate((buttWidth/2+legWidth/2), 1, objectDepth/3-legWidth-0.13)
-            m = mult(m, rotate(theta[ID], 0, 0, 1))
-            figure[ID] = createNode(m, tail, rightBackLegID, null)
+            trans = translate((buttWidth/2+legWidth/2), 1, objectDepth/3-legWidth-0.13)
+            rot = rotate(theta[ID], 0, 0, 1)
+            m = mult(trans, rot)
+            figure[ID] = createNode(m, trans, rot, tail, rightBackLegID, null)
             break
         case(rightFrontLegID):
-            m = translate(-chestWidth/2 + legWidth, -legHeight, -earDepth+objectDepth/2)
-            m = mult(m, rotate(theta[ID], 0, 0, 1))
-            figure[ID] = createNode(m, leg, leftFrontLegID, null)
+            trans = translate(-chestWidth/2 + legWidth, -legHeight+0.5, -earDepth+objectDepth/2)
+            rot = rotate(theta[ID], 0, 0, 1)
+            m = mult(trans, rot)
+            figure[ID] = createNode(m, trans, rot, leg, leftFrontLegID, null)
             break
         case(leftFrontLegID):
-            m = translate(-chestWidth/2 + legWidth, -legHeight, -earDepth)
-            m = mult(m, rotate(theta[ID], 0, 0, 1))
-            figure[ID] = createNode(m, leg, null, null)
+            trans = translate(-chestWidth/2 + legWidth, -legHeight+0.5, -earDepth)
+            rot = rotate(theta[ID], 0, 0, 1)
+            m = mult(trans, rot)
+            figure[ID] = createNode(m, trans, rot, leg, null, null)
             break
         case(rightBackLegID):
-            m = translate(buttWidth/2-legWidth-0.4, -buttHeight, -earDepth+objectDepth/2)
-            m = mult(m, rotate(theta[ID], 0, 0, 1))
-            figure[ID] = createNode(m, leg, leftBackLegID, null)
+            trans = translate(buttWidth/2-legWidth-0.4, -buttHeight+0.5, -earDepth+objectDepth/2)
+            rot = rotate(theta[ID], 0, 0, 1)
+            m = mult(trans, rot)
+            figure[ID] = createNode(m, trans, rot, leg, leftBackLegID, null)
             break
         case(leftBackLegID):
-            m = translate(buttWidth/2-legWidth-0.4, -buttHeight, -earDepth)
-            m = mult(m, rotate(theta[ID], 0, 0, 1))
-            figure[ID] = createNode(m, leg, null, null)
+            trans = translate(buttWidth/2-legWidth-0.4, -buttHeight+0.5, -earDepth)
+            rot = rotate(theta[ID], 0, 0, 1)
+            figure[ID] = createNode(m, trans, rot, leg, null, null)
             break
         case(headID):
-            m = translate(-chestWidth/2-headWidth/2, 0, 0)
-            m = mult(m, rotate(theta[ID], 0, 1, 0))
-            figure[ID] = createNode(m, head, rightFrontLegID, snoutID)
+            trans = translate(-chestWidth/2-headWidth/2, 0, 0)
+            rot = rotate(theta[ID], 0, 1, 0)
+            m = mult(trans, rot)
+            figure[ID] = createNode(m, trans, rot, head, rightFrontLegID, snoutID)
             break
         case(snoutID):
-            m = translate(-headWidth, -(chestHeight/2-snoutHeight/2), -(objectDepth/2-snoutDepth/2)+((objectDepth-snoutDepth)/2))
-            figure[ID] = createNode(m, snout, rightEarID, noseID)
+            trans = translate(-headWidth, -(chestHeight/2-snoutHeight/2), -(objectDepth/2-snoutDepth/2)+((objectDepth-snoutDepth)/2))
+            figure[ID] = createNode(trans, trans, rot, snout, rightEarID, noseID)
             break
         case(rightEarID):
-            m = translate(0, chestHeight/2+earHeight/2, earDepth-objectDepth/2)
-            m = mult(m, rotate(theta[ID], 1, 0, 0))
-            figure[ID] = createNode(m, ear, leftEarID, null)
+            trans = translate(0, chestHeight/2+earHeight/2, earDepth-objectDepth/2)
+            rot = rotate(theta[ID], 1, 0, 0)
+            m = mult(trans, rot)
+            figure[ID] = createNode(m, trans, rot, ear, leftEarID, null)
             break
         case(leftEarID):
-            m = translate(0, chestHeight/2+earHeight/2, earDepth)
-            m = mult(m, rotate(theta[ID], 1, 0, 0))
-            figure[ID] = createNode(m, ear, rightEyeID, null)
+            trans = translate(0, chestHeight/2+earHeight/2, earDepth)
+            rot = rotate(theta[ID], 1, 0, 0)
+            m = mult(trans, rot)
+            figure[ID] = createNode(m, trans, rot, ear, rightEyeID, null)
             break
         case(rightEyeID):
-            m = translate(eyeDepth-headWidth+0.2, 0.35, -objectDepth/2+0.6)
-            figure[ID] = createNode(m, eye, leftEyeID, null)
+            trans = translate(eyeDepth-headWidth+0.2, 0.35, -objectDepth/2+0.6)
+            figure[ID] = createNode(trans, trans, rot, eye, leftEyeID, null)
             break
         case(leftEyeID):
             m = translate(eyeDepth-headWidth+0.2, 0.35, objectDepth/2-0.6)
-            figure[ID] = createNode(m, eye, null, null)
+            figure[ID] = createNode(m, m, rot, eye, null, null)
             break
         case(noseID):
             m = translate(-snoutWidth+eyeDepth+0.3, 0.2, 0)
-            figure[ID] = createNode(m, eye, null, null)
+            figure[ID] = createNode(m, m, rot, eye, null, null)
             break
     }
 }
@@ -194,7 +206,7 @@ function chest(){
 }
 
 function butt(){
-    instanceMatrix = mult(modelViewMatrix, scale4(buttWidth, buttHeight, objectDepth));
+    instanceMatrix = mult(modelViewMatrix, scale4(buttWidth, buttHeight, objectDepth-0.1));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
 	gl.uniform4fv(colorLoc, flatten(vec4(0.94, 1, 0.88, 1)));
     drawCube()
@@ -270,8 +282,9 @@ window.onload = function init() {
    gl.useProgram( program)
 
    instanceMatrix = mat4()
-   projectionMatrix = ortho(-10.0,10.0,-10.0, 10.0,-10.0,10.0)
-   modelViewMatrix = mat4()
+   projectionMatrix = perspective(40, 1.33, 0.01, 100)
+   modelViewMatrix = translate(0, 0, -1.5)
+   modelViewMatrix = mult(modelViewMatrix, scale4(0.1, 0.1, 0.1))
    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix")
 
    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix) )
@@ -297,11 +310,32 @@ window.onload = function init() {
    render()
 }
 
+const clamp = (num, min, max) => {
+    return Math.min(Math.max(num, min), max);
+}
 
+var kft = 0
 function render() {
-       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-    //    modelViewMatrix = mat4()
-       traverse(chestID)
-       console.log(stack)
-       requestAnimFrame(render)
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+    // animate legs somehow
+    let swingAngle = -50 + (Math.sin(kft * Math.PI * 2) + 1) * 50;
+    let rot = rotate(swingAngle, 0, 0, 1)
+    let negRot = rotate(-swingAngle, 0, 0, 1)
+    figure[leftBackLegID].transform = mult(figure[leftBackLegID].translate, rot)
+    figure[leftFrontLegID].transform = mult(figure[leftFrontLegID].translate, rot)
+    figure[rightBackLegID].transform = mult(figure[rightBackLegID].translate, negRot)
+    figure[rightFrontLegID].transform = mult(figure[rightFrontLegID].translate, negRot)
+    figure[tailID].transform = mult(figure[tailID].translate, rot)
+    let headSwingAngle = -90 + (Math.sin(kft * Math.PI * 2) + 1) * 90;
+    figure[headID].transform = mult(figure[headID].translate, rotate(headSwingAngle, 0, 1, 0))
+    let bootySwingAngle = 0 + (Math.sin(kft * Math.PI * 2)+1) * -10
+    figure[buttID].transform = mult(figure[buttID].translate, rotateZ(bootySwingAngle+1))
+    traverse(chestID)
+    stack = []
+    kft += 0.02
+    if(kft >= 1){
+        kft = 0
+    }
+    kft = clamp(kft, 0, 1)
+    requestAnimFrame(render)
 }
