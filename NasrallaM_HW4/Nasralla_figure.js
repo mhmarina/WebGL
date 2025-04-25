@@ -270,9 +270,9 @@ function eye(){
 // time for some texture map action
 var texCoord = [
     vec2(0, 0),
-    vec2(0, 1),
-    vec2(1,1),
-    vec2(1, 0)
+    vec2(0, 5),
+    vec2(5,5),
+    vec2(5, 0)
 ];
 
 function configureTexture( myimage ) {
@@ -284,7 +284,6 @@ function configureTexture( myimage ) {
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, 
                       gl.NEAREST_MIPMAP_LINEAR );
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
-    
     gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
 }
 
@@ -418,7 +417,7 @@ function render() {
     gl.useProgram(textureProgram)
     groundPlane()
 
-    kft += 0.02
+    kft += 0.01
     if(kft >= 1){
         kft = 0
     }
