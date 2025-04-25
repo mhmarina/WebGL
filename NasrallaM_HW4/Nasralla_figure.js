@@ -13,6 +13,7 @@ var colorLoc
 var vBuffer
 var modelViewLoc
 var grassImage
+var pixelsImage
 
 var pointsArray = []
 var stack = []
@@ -21,10 +22,10 @@ var texCoordsArray = []
 
 var viewer = 
 {
-	eye: vec3(0.0, 0.0, 20),
+	eye: vec3(0.0, 0.0, 15),
 	at:  vec3(0.0, 0.0, 0.0),  
 	up:  vec3(0.0, 1.0, 0.0),
-    radius: 20,
+    radius: 15,
     theta: 0,
     phi: 0
 };
@@ -270,9 +271,9 @@ function eye(){
 // time for some texture map action
 var texCoord = [
     vec2(0, 0),
-    vec2(0, 5),
-    vec2(5,5),
-    vec2(5, 0)
+    vec2(0, 3),
+    vec2(3,3),
+    vec2(3, 0)
 ];
 
 function configureTexture( myimage ) {
@@ -291,6 +292,7 @@ function groundPlane(){
     var m = mult(modelViewMatrix, translate(0, -7.6, 0))
     m = mult(m, scale4(50,10,50))
     gl.uniformMatrix4fv(gl.getUniformLocation(textureProgram, "modelViewMatrix"), false, flatten(m))
+    gl.uniform4fv(colorLoc, flatten(vec4(0.5, 1, 0, 1)));
     drawCube()
 }
 
@@ -366,18 +368,24 @@ window.onload = function init() {
    var vPosition = gl.getAttribLocation( textureProgram, "vPosition" )
    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 )
    gl.enableVertexAttribArray( vPosition )
+   gl.uniform4fv(gl.getUniformLocation(textureProgram, "color"), flatten(new vec4(0, 1, 0, 1)) )
 
    // initialize all nodes
    for(i=0; i<numNodes; i++) {
     initNodes(i)
    }
 
-   grassImage = new Image();
-   grassImage.crossOrigin = "anonymous";
-   grassImage.src = grass_base64
-   grassImage.onload = function() { 
-    configureTexture( grassImage );
-    }
+   // textures
+    pixelsImage = new Image();
+    pixelsImage.crossOrigin = "anonymous";
+    pixelsImage.src = pixels_base64
+    pixelsImage.onload = function() { 
+        configureTexture( pixelsImage );
+    } 
+
+    grassImage = new Image();
+    grassImage.crossOrigin = "anonymous";
+    grassImage.src = grass_base64
     
    mouseControls()
    render()
@@ -410,11 +418,14 @@ function render() {
     let bootySwingAngle = 0 + (Math.sin(kft * Math.PI * 2)+1) * -10
     figure[buttID].transform = mult(figure[buttID].translate, rotateZ(bootySwingAngle+1))
     
-    gl.useProgram(program)
+    gl.useProgram(textureProgram)
+    modelViewMatrixLoc = gl.getUniformLocation(textureProgram, "modelViewMatrix")
+    colorLoc = gl.getUniformLocation(textureProgram, "color")
+    // set pixels texture here 
     traverse(chestID)
     stack = []
 
-    gl.useProgram(textureProgram)
+    //gl.useProgram(textureProgram)
     groundPlane()
 
     kft += 0.01
