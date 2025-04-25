@@ -264,6 +264,14 @@ function eye(){
     drawCube()
 }
 
+function groundPlane(){
+    var m = mult(modelViewMatrix, translate(0, -7.6, 0))
+    m = mult(m, scale4(50,10,50))
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(m))
+    gl.uniform4fv(colorLoc, flatten(vec4(0, 0.42, 0, 1)))
+    drawCube()
+}
+
 function quad(a, b, c, d) {
     pointsArray.push(vertices[a]) 
     pointsArray.push(vertices[b]) 
@@ -287,7 +295,7 @@ window.onload = function init() {
    if ( !gl ) { alert( "WebGL isn't available" ) }
    
    gl.viewport( 0, 0, canvas.width, canvas.height )
-   gl.clearColor( 0, 0.3, 0, 1.0 )
+   gl.clearColor( 0.322, 0.69, 1, 1.0 )
    gl.enable(gl.DEPTH_TEST)
    program = initShaders( gl, "vertex-shader", "fragment-shader")
    gl.useProgram( program)
@@ -317,6 +325,8 @@ window.onload = function init() {
    for(i=0; i<numNodes; i++) {
     initNodes(i)
    }
+
+   // draw ground plane :3
    mouseControls()
    render()
 }
@@ -345,10 +355,11 @@ function render() {
 
     let headSwingAngle = -90 + (Math.sin(kft * Math.PI * 2) + 1) * 90;
     figure[headID].transform = mult(figure[headID].translate, rotate(headSwingAngle, 0, 1, 0))
-    
+
     let bootySwingAngle = 0 + (Math.sin(kft * Math.PI * 2)+1) * -10
     figure[buttID].transform = mult(figure[buttID].translate, rotateZ(bootySwingAngle+1))
 
+    groundPlane()
     traverse(chestID)
     stack = []
 
