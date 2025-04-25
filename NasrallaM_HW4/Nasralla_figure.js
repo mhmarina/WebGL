@@ -291,7 +291,7 @@ function configureTexture( myimage ) {
 function groundPlane(){
     var m = mult(modelViewMatrix, translate(0, -7.6, 0))
     m = mult(m, scale4(50,10,50))
-    gl.uniformMatrix4fv(gl.getUniformLocation(textureProgram, "modelViewMatrix"), false, flatten(m))
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(m))
     gl.uniform4fv(colorLoc, flatten(vec4(0, 0.34, 0.06, 1)));
     drawCube()
 }
@@ -371,6 +371,22 @@ window.onload = function init() {
     pixelsImage.onload = function() { 
         configureTexture( pixelsImage );
     } 
+
+    // add some movement controls :D
+    addEventListener("keypress", (k) => {
+        if(k.key === 'w'){
+            figure[chestID].transform = mult(figure[chestID].transform, translate(-1, 0, 0, 1))
+        }
+        if(k.key === 's'){
+            figure[chestID].transform = mult(figure[chestID].transform, translate(1, 0, 0, 1))
+        }
+        if(k.key === 'a'){
+            figure[chestID].transform = mult(figure[chestID].transform, rotate(10, 0, 1, 0)) 
+        }
+        if(k.key === 'd'){
+            figure[chestID].transform = mult(figure[chestID].transform, rotate(-10, 0, 1, 0)) 
+        }
+    })
     
    mouseControls()
    render()
@@ -402,11 +418,11 @@ function render() {
 
     let bootySwingAngle = 0 + (Math.sin(kft * Math.PI * 2)+1) * -10
     figure[buttID].transform = mult(figure[buttID].translate, rotateZ(bootySwingAngle+1))
-    
-    traverse(chestID)
-    stack = []
 
     groundPlane()
+
+    traverse(chestID)
+    stack = []
 
     kft += 0.01
     if(kft >= 1){
