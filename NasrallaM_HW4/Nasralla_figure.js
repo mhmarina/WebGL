@@ -1,4 +1,5 @@
 // Marina Nasralla
+// 4/28/2025
 var canvas
 var gl
 var program
@@ -12,7 +13,6 @@ var colorLoc
 
 var vBuffer
 var modelViewLoc
-var grassImage
 var pixelsImage
 
 var pointsArray = []
@@ -22,10 +22,10 @@ var texCoordsArray = []
 
 var viewer = 
 {
-	eye: vec3(0.0, 0.0, 15),
+	eye: vec3(0.0, 0.0, 18),
 	at:  vec3(0.0, 0.0, 0.0),  
 	up:  vec3(0.0, 1.0, 0.0),
-    radius: 15,
+    radius: 18,
     theta: 0,
     phi: 0
 };
@@ -271,9 +271,9 @@ function eye(){
 // time for some texture map action
 var texCoord = [
     vec2(0, 0),
-    vec2(0, 3),
-    vec2(3,3),
-    vec2(3, 0)
+    vec2(0, 1),
+    vec2(1,1),
+    vec2(1, 0)
 ];
 
 function configureTexture( myimage ) {
@@ -292,7 +292,7 @@ function groundPlane(){
     var m = mult(modelViewMatrix, translate(0, -7.6, 0))
     m = mult(m, scale4(50,10,50))
     gl.uniformMatrix4fv(gl.getUniformLocation(textureProgram, "modelViewMatrix"), false, flatten(m))
-    gl.uniform4fv(colorLoc, flatten(vec4(0.5, 1, 0, 1)));
+    gl.uniform4fv(colorLoc, flatten(vec4(0, 0.34, 0.06, 1)));
     drawCube()
 }
 
@@ -327,16 +327,16 @@ window.onload = function init() {
    gl.enable(gl.DEPTH_TEST)
    textureProgram = initShaders( gl, "texturev-shader", "texturef-shader")
    program = initShaders( gl, "vertex-shader", "fragment-shader")
-   gl.useProgram(program)
+   gl.useProgram(textureProgram)
 
    instanceMatrix = mat4()
    projectionMatrix = perspective(45, 1.33, 0.01, 100)
    modelViewMatrix = lookAt(vec3(viewer.eye), viewer.at, viewer.up)
-   modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix")
+   modelViewMatrixLoc = gl.getUniformLocation(textureProgram, "modelViewMatrix")
 
    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix) )
-   gl.uniformMatrix4fv(gl.getUniformLocation(program, "projectionMatrix"), false, flatten(projectionMatrix) )
-   colorLoc = gl.getUniformLocation(program, "color")
+   gl.uniformMatrix4fv(gl.getUniformLocation(textureProgram, "projectionMatrix"), false, flatten(projectionMatrix) )
+   colorLoc = gl.getUniformLocation(textureProgram, "color")
    gl.uniform4fv(colorLoc, flatten(new vec4(0.9, 0.74, 0.78, 1)) )
 
    // create cube prototype
@@ -346,12 +346,11 @@ window.onload = function init() {
    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer )
    gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW)
    
-   var vPosition = gl.getAttribLocation( program, "vPosition" )
+   var vPosition = gl.getAttribLocation( textureProgram, "vPosition" )
    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 )
    gl.enableVertexAttribArray( vPosition )
 
    // texture program type shi
-   gl.useProgram(textureProgram)
    var tBuffer = gl.createBuffer()
    gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer )
    gl.bufferData( gl.ARRAY_BUFFER, flatten(texCoordsArray), gl.STATIC_DRAW )
@@ -359,16 +358,6 @@ window.onload = function init() {
    var vTexCoord = gl.getAttribLocation( textureProgram, "vTexCoord" )
    gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 )
    gl.enableVertexAttribArray( vTexCoord )
-
-   gl.uniformMatrix4fv(gl.getUniformLocation(textureProgram, "modelViewMatrix"), false, flatten(modelViewMatrix))
-   gl.uniformMatrix4fv(gl.getUniformLocation(textureProgram, "projectionMatrix"), false, flatten(projectionMatrix))
-   vBuffer = gl.createBuffer()
-   gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer )
-   gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW)
-   var vPosition = gl.getAttribLocation( textureProgram, "vPosition" )
-   gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 )
-   gl.enableVertexAttribArray( vPosition )
-   gl.uniform4fv(gl.getUniformLocation(textureProgram, "color"), flatten(new vec4(0, 1, 0, 1)) )
 
    // initialize all nodes
    for(i=0; i<numNodes; i++) {
@@ -382,10 +371,6 @@ window.onload = function init() {
     pixelsImage.onload = function() { 
         configureTexture( pixelsImage );
     } 
-
-    grassImage = new Image();
-    grassImage.crossOrigin = "anonymous";
-    grassImage.src = grass_base64
     
    mouseControls()
    render()
@@ -418,14 +403,9 @@ function render() {
     let bootySwingAngle = 0 + (Math.sin(kft * Math.PI * 2)+1) * -10
     figure[buttID].transform = mult(figure[buttID].translate, rotateZ(bootySwingAngle+1))
     
-    gl.useProgram(textureProgram)
-    modelViewMatrixLoc = gl.getUniformLocation(textureProgram, "modelViewMatrix")
-    colorLoc = gl.getUniformLocation(textureProgram, "color")
-    // set pixels texture here 
     traverse(chestID)
     stack = []
 
-    //gl.useProgram(textureProgram)
     groundPlane()
 
     kft += 0.01
