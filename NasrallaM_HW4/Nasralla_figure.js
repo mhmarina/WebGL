@@ -15,6 +15,16 @@ var pointsArray = []
 var stack = []
 var figure = []
 
+var viewer = 
+{
+	eye: vec3(0.0, 0.0, 20),
+	at:  vec3(0.0, 0.0, 0.0),  
+	up:  vec3(0.0, 1.0, 0.0),
+    radius: 20,
+    theta: 0,
+    phi: 0
+};
+
 // these vertices make up a prototype cube
 // which will be transformed into the various elements of the object..
 var vertices = [
@@ -67,7 +77,7 @@ var eyeDepth = 0.3
 // rotations I guess reflect where the fixed points are
 // the angles are relative to their parents
 // with this butt translation: m = mult(m, translate(-0.5, -0.6, 0)) 
-var theta = [1, 0, 210, 150, 210, 150, 0, 0, 0, 0, 0, 0, 310] // standing pose, tail to the right, first frame in walk cycle
+var theta = [0, 0, 210, 150, 210, 150, 0, 0, 0, 0, 0, 0, 310] // standing pose, tail to the right, first frame in walk cycle
 
 // helper functions
 function scale4(a, b, c) {
@@ -282,9 +292,8 @@ window.onload = function init() {
    gl.useProgram( program)
 
    instanceMatrix = mat4()
-   projectionMatrix = perspective(40, 1.33, 0.01, 100)
-   modelViewMatrix = translate(0, 0, -1.5)
-   modelViewMatrix = mult(modelViewMatrix, scale4(0.1, 0.1, 0.1))
+   projectionMatrix = perspective(45, 1.33, 0.01, 100)
+   modelViewMatrix = lookAt(vec3(viewer.eye), viewer.at, viewer.up)
    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix")
 
    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix) )
@@ -307,6 +316,7 @@ window.onload = function init() {
    for(i=0; i<numNodes; i++) {
     initNodes(i)
    }
+   mouseControls()
    render()
 }
 
@@ -317,6 +327,10 @@ const clamp = (num, min, max) => {
 var kft = 0
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+    modelViewMatrix = lookAt(vec3(viewer.eye), viewer.at, viewer.up);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix) );
+
     // animate legs somehow
     let swingAngle = -50 + (Math.sin(kft * Math.PI * 2) + 1) * 50;
     let rot = rotate(swingAngle, 0, 0, 1)
