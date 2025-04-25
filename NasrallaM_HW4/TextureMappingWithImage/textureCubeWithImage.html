@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+</head>
+
+<style>
+body
+{
+    font-style: normal;
+    font-family: Arial;
+    color: #222;
+    padding: 0 1em;
+    line-height: 1.25em;
+}
+</style>
+
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+attribute  vec4 vPosition;
+attribute  vec4 vColor;
+attribute  vec2 vTexCoord;
+
+varying vec4 fColor;
+varying vec2 fTexCoord;
+
+uniform vec3 theta;
+
+void main() 
+{
+    // Compute the sines and cosines of theta for each of
+    //   the three axes in one computation.
+    vec3 angles = radians( theta );
+    vec3 c = cos( angles );
+    vec3 s = sin( angles );
+
+    // Remeber: thse matrices are column-major
+    mat4 rx = mat4( 1.0,  0.0,  0.0, 0.0,
+		    0.0,  c.x,  s.x, 0.0,
+		    0.0, -s.x,  c.x, 0.0,
+		    0.0,  0.0,  0.0, 1.0 );
+
+    mat4 ry = mat4( c.y, 0.0, -s.y, 0.0,
+		    0.0, 1.0,  0.0, 0.0,
+		    s.y, 0.0,  c.y, 0.0,
+		    0.0, 0.0,  0.0, 1.0 );
+
+    mat4 rz = mat4( c.z, -s.z, 0.0, 0.0,
+		    s.z,  c.z, 0.0, 0.0,
+		    0.0,  0.0, 1.0, 0.0,
+		    0.0,  0.0, 0.0, 1.0 );
+                
+    fColor = vColor;
+    fTexCoord = vTexCoord;
+    gl_Position = rz * ry * rx * vPosition;
+} 
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+varying vec4 fColor;
+varying  vec2 fTexCoord;
+
+uniform int modulateTexture;
+
+uniform sampler2D texture;
+
+void
+main()
+{
+    //demo: Two options: blend with vertex color (modulate) 
+	// or use texture only (decal)
+	
+    if(modulateTexture == 1)
+		gl_FragColor = fColor * texture2D( texture, fTexCoord );
+	else
+		gl_FragColor = texture2D( texture, fTexCoord );
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="textureCubeWithImage
+.js"></script>
+<script type="text/javascript" src="SA2011_black.gif.js"></script>
+<script type="text/javascript" src="DCHeyePower2.jpg.js"></script>
+
+<body>
+
+<h1> Texture Mapping Demo</h1>
+<h3>This program demonstrates: </h3>
+<ul>
+<li> Loading a gif or jpeg image as the texture.
+To get around the CORS browser policy, the image converted to a URI.(If you have a server running on your computer, you do not need this URI step.</li>
+<li> How to set texture coordinates for a cube.</li>
+<li> Using the sampler to interpolate texture coordinates over the triangles in the fragment shader.</li>
+<li> In the fragment shader the color assigned to each face of the cube is blended with the color of the texture. Notice that the SIGGRAPH logo has a different color on each face. This color modulation can be turned off with the user interface below.</li>
+<li>See the configureTexture function for settings. This uses the FLIP setting because of the organization of gif files.</li>
+</ul>
+
+</p>
+
+
+<canvas id="gl-canvas" width="512" height="512">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+
+<div>
+<button id = "ButtonX">Rotate X</button>
+<button id = "ButtonY">Rotate Y</button>
+<button id = "ButtonZ">Rotate Z</button>
+</div>
+<div>
+<select id="ImageControls" size="2">
+    <option value="0">SIGGRAPH Image</option>
+    <option value="1">Eye Image</option>
+</select>
+&nbsp &nbsp
+<button id="ModulateButton">Modulate Texture Toggle</button>
+</div>
+
+<p>
+The images used in the texture mapping
+</p>
+
+<img src = "SA2011_black.gif"></img>
+<img src = "DCHeyePower2.jpg"></img>
+
+<p>
+Original program created by E. Angel. Modified by Dianne Hansford
+</body>
+</html>

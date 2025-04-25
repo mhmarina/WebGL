@@ -1,0 +1,24 @@
+
+Instructions for preparing an image to be a texture map.
+
+1. Get a power of two image
+Free product Pixlr worked. (Choose Smart Resize icon on right. It looks like a square.)
+
+2. Drag the image into https://dataurl.app/ to create a url file from image. 
+
+Open the file created in the app in text editor and add to top of file
+window.filename_data_url = `
+Example: window.myCoolImage_data_url = ` 
+
+Add at bottom of file
+`;
+
+Save the file as filename.extension.js.
+For example, myCoolImage.jpg.js
+
+3. Add file to list of scripts in the html document
+
+4. Load into "myimage" variable in the js file (using what it is called in the js file. For example, window.myCoolImage_data_url
+
+5. Be sure to open the console to see if there are any errors.
+

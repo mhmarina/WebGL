@@ -2,6 +2,7 @@
 var canvas
 var gl
 var program
+var textureProgram
 
 var projectionMatrix 
 var modelViewMatrix
@@ -11,10 +12,12 @@ var colorLoc
 
 var vBuffer
 var modelViewLoc
+var grassImage
 
 var pointsArray = []
 var stack = []
 var figure = []
+var texCoordsArray = []
 
 var viewer = 
 {
@@ -264,19 +267,43 @@ function eye(){
     drawCube()
 }
 
+// time for some texture map action
+var texCoord = [
+    vec2(0, 0),
+    vec2(0, 1),
+    vec2(1,1),
+    vec2(1, 0)
+];
+
+function configureTexture( myimage ) {
+    texture = gl.createTexture();
+    gl.bindTexture( gl.TEXTURE_2D, texture );
+    gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, 
+         gl.RGB, gl.UNSIGNED_BYTE, myimage );
+    gl.generateMipmap( gl.TEXTURE_2D );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, 
+                      gl.NEAREST_MIPMAP_LINEAR );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+    
+    gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
+}
+
 function groundPlane(){
     var m = mult(modelViewMatrix, translate(0, -7.6, 0))
     m = mult(m, scale4(50,10,50))
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(m))
-    gl.uniform4fv(colorLoc, flatten(vec4(0, 0.42, 0, 1)))
+    gl.uniformMatrix4fv(gl.getUniformLocation(textureProgram, "modelViewMatrix"), false, flatten(m))
     drawCube()
 }
 
 function quad(a, b, c, d) {
     pointsArray.push(vertices[a]) 
+    texCoordsArray.push(texCoord[0])
     pointsArray.push(vertices[b]) 
-    pointsArray.push(vertices[c])     
-    pointsArray.push(vertices[d])    
+    texCoordsArray.push(texCoord[1])
+    pointsArray.push(vertices[c]) 
+    texCoordsArray.push(texCoord[2])    
+    pointsArray.push(vertices[d]) 
+    texCoordsArray.push(texCoord[3])   
 }
 
 function cube()
@@ -297,8 +324,9 @@ window.onload = function init() {
    gl.viewport( 0, 0, canvas.width, canvas.height )
    gl.clearColor( 0.322, 0.69, 1, 1.0 )
    gl.enable(gl.DEPTH_TEST)
+   textureProgram = initShaders( gl, "texturev-shader", "texturef-shader")
    program = initShaders( gl, "vertex-shader", "fragment-shader")
-   gl.useProgram( program)
+   gl.useProgram(program)
 
    instanceMatrix = mat4()
    projectionMatrix = perspective(45, 1.33, 0.01, 100)
@@ -321,12 +349,37 @@ window.onload = function init() {
    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 )
    gl.enableVertexAttribArray( vPosition )
 
+   // texture program type shi
+   gl.useProgram(textureProgram)
+   var tBuffer = gl.createBuffer()
+   gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer )
+   gl.bufferData( gl.ARRAY_BUFFER, flatten(texCoordsArray), gl.STATIC_DRAW )
+   
+   var vTexCoord = gl.getAttribLocation( textureProgram, "vTexCoord" )
+   gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 )
+   gl.enableVertexAttribArray( vTexCoord )
+
+   gl.uniformMatrix4fv(gl.getUniformLocation(textureProgram, "modelViewMatrix"), false, flatten(modelViewMatrix))
+   gl.uniformMatrix4fv(gl.getUniformLocation(textureProgram, "projectionMatrix"), false, flatten(projectionMatrix))
+   vBuffer = gl.createBuffer()
+   gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer )
+   gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW)
+   var vPosition = gl.getAttribLocation( textureProgram, "vPosition" )
+   gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 )
+   gl.enableVertexAttribArray( vPosition )
+
    // initialize all nodes
    for(i=0; i<numNodes; i++) {
     initNodes(i)
    }
 
-   // draw ground plane :3
+   grassImage = new Image();
+   grassImage.crossOrigin = "anonymous";
+   grassImage.src = grass_base64
+   grassImage.onload = function() { 
+    configureTexture( grassImage );
+    }
+    
    mouseControls()
    render()
 }
@@ -340,7 +393,6 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
     modelViewMatrix = lookAt(vec3(viewer.eye), viewer.at, viewer.up);
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix) );
 
     // animation lol
     let swingAngle = -50 + (Math.sin(kft * Math.PI * 2) + 1) * 50;
@@ -358,10 +410,13 @@ function render() {
 
     let bootySwingAngle = 0 + (Math.sin(kft * Math.PI * 2)+1) * -10
     figure[buttID].transform = mult(figure[buttID].translate, rotateZ(bootySwingAngle+1))
-
-    groundPlane()
+    
+    gl.useProgram(program)
     traverse(chestID)
     stack = []
+
+    gl.useProgram(textureProgram)
+    groundPlane()
 
     kft += 0.02
     if(kft >= 1){

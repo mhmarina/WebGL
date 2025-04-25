@@ -25,27 +25,53 @@
   {
     // passes color and assigns position
     fcolor = color;
-      gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+    gl_Position = projectionMatrix * modelViewMatrix * vPosition;
   } 
+  </script>
+  <script id="texturev-shader" type="x-shader/x-vertex">
+    attribute  vec4 vPosition;
+    attribute  vec2 vTexCoord;
+  
+    uniform mat4 modelViewMatrix;
+    uniform mat4 projectionMatrix;  
+    varying vec2 fTexCoord;
+  
+    void main() 
+    {
+      // passes color and assigns position
+      fTexCoord = vTexCoord;
+      gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+    }   
   </script>
 
   <script id="fragment-shader" type="x-shader/x-fragment">
 
-  precision mediump float;
-  varying vec4 fcolor;
-
-  void main()
-  {
-    // assigns color
-      /*gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); */
-    gl_FragColor = fcolor;
-
-  }
+    precision mediump float;
+    varying vec4 fcolor;
+    void main()
+    {
+      gl_FragColor = fcolor;
+    }
   </script>
+  <script id="texturef-shader" type="x-shader/x-vertex">
+    precision mediump float;
+    varying vec4 fcolor;
+    varying  vec2 fTexCoord;
+
+    uniform sampler2D texture;
+
+    void main()
+    {
+      gl_FragColor = texture2D(texture, fTexCoord);
+    }
+  </script>
+
+
   <script type="text/javascript" src="Common/webgl-utils.js"></script>
   <script type="text/javascript" src="Common/InitShaders.js"></script>
   <script type="text/javascript" src="Common/MV.js"></script>
   <script type="text/javascript" src="Nasralla_figure.js"></script>
+  <script type="text/javascript" src="grass_base64.js"></script>
   <script type="text/javascript" src="mouseControl.js"></script>
 
 </head>
