@@ -1,3 +1,4 @@
+// Marina Nasralla
 var canvas
 var gl
 var program
@@ -331,21 +332,26 @@ function render() {
     modelViewMatrix = lookAt(vec3(viewer.eye), viewer.at, viewer.up);
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix) );
 
-    // animate legs somehow
+    // animation lol
     let swingAngle = -50 + (Math.sin(kft * Math.PI * 2) + 1) * 50;
     let rot = rotate(swingAngle, 0, 0, 1)
     let negRot = rotate(-swingAngle, 0, 0, 1)
+
     figure[leftBackLegID].transform = mult(figure[leftBackLegID].translate, rot)
     figure[leftFrontLegID].transform = mult(figure[leftFrontLegID].translate, rot)
     figure[rightBackLegID].transform = mult(figure[rightBackLegID].translate, negRot)
     figure[rightFrontLegID].transform = mult(figure[rightFrontLegID].translate, negRot)
     figure[tailID].transform = mult(figure[tailID].translate, rot)
+
     let headSwingAngle = -90 + (Math.sin(kft * Math.PI * 2) + 1) * 90;
     figure[headID].transform = mult(figure[headID].translate, rotate(headSwingAngle, 0, 1, 0))
+    
     let bootySwingAngle = 0 + (Math.sin(kft * Math.PI * 2)+1) * -10
     figure[buttID].transform = mult(figure[buttID].translate, rotateZ(bootySwingAngle+1))
+
     traverse(chestID)
     stack = []
+
     kft += 0.02
     if(kft >= 1){
         kft = 0

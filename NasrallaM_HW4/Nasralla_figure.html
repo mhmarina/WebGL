@@ -1,0 +1,69 @@
+<!-- Marina Nasralla -->
+<html>
+  <head>
+  <style>
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 15px;
+  }
+  </style>
+
+  <script id="vertex-shader" type="x-shader/x-vertex">
+
+  attribute  vec4 vPosition;
+
+  uniform mat4 modelViewMatrix;
+  uniform mat4 projectionMatrix;
+  uniform vec4 color;
+
+  varying vec4 fcolor;
+
+  void main() 
+  {
+    // passes color and assigns position
+    fcolor = color;
+      gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+  } 
+  </script>
+
+  <script id="fragment-shader" type="x-shader/x-fragment">
+
+  precision mediump float;
+  varying vec4 fcolor;
+
+  void main()
+  {
+    // assigns color
+      /*gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); */
+    gl_FragColor = fcolor;
+
+  }
+  </script>
+  <script type="text/javascript" src="Common/webgl-utils.js"></script>
+  <script type="text/javascript" src="Common/InitShaders.js"></script>
+  <script type="text/javascript" src="Common/MV.js"></script>
+  <script type="text/javascript" src="Nasralla_figure.js"></script>
+  <script type="text/javascript" src="mouseControl.js"></script>
+
+</head>
+  <body> 
+    <div style="display: flex; flex-direction: row; gap:10px; margin-bottom: 10px;">
+      <canvas id="gl-canvas" width="512" height="512">
+        Oops ... your browser doesn't support the HTML5 canvas element
+        </canvas>
+        <div>
+          <h2> Marina Nasralla, 4/28 </h2>
+          <h2> Assignment 4: Dancer </h2> 
+          <h2> Resources: </h2>
+          <ul>
+            <li><a href="https://minecraft.fandom.com/wiki/Wolf">Minecraft Wiki</a></li>
+            <li>Hierarchical Modeling -- Class resources</a></li>
+          </ul>     
+        </div>
+    </div>
+    Play "Dog.mp3" from the Minecraft Soundtrack: <div class="audio"><audio src="Dog.mp3" controls loop="true"></div>
+  </body>
+</html>
