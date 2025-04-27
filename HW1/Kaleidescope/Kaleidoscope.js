@@ -178,13 +178,6 @@ window.onload = function init()
 
 	// draw 
 	render();
-	
-    /* this is a little play to demo double buffering that occurs when call render -- revisit after doublebuffer ppt */
-	/*
-	console.log("displayed initially -- wait  and do again")
-	setTimeout(function(){render();}, 5000);
-	console.log("did it");
-	*/
 };
 
 
@@ -198,7 +191,6 @@ function render() {
 
 	theta += deltaRadians
 
-	console.log(centers)
 	for(let i = 0; i < 11; i++){
 		// set center uniform
 		gl.uniform2f(vCenter, centers[i][0], centers[i][1])
