@@ -14,6 +14,10 @@ var colorLoc
 var vBuffer
 var modelViewLoc
 var pixelsImage
+var grassImage
+
+var grassTexture
+var pixelTexture
 
 var pointsArray = []
 var stack = []
@@ -286,13 +290,14 @@ function configureTexture( myimage ) {
                       gl.NEAREST_MIPMAP_LINEAR );
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
     gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
+    return texture;
 }
 
 function groundPlane(){
     var m = mult(modelViewMatrix, translate(0, -7.6, 0))
     m = mult(m, scale4(50,10,50))
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(m))
-    gl.uniform4fv(colorLoc, flatten(vec4(0, 0.34, 0.06, 1)));
+    gl.uniform4fv(colorLoc, flatten(vec4(0, 0.8, 0.06, 1)));
     drawCube()
 }
 
@@ -369,8 +374,16 @@ window.onload = function init() {
     pixelsImage.crossOrigin = "anonymous";
     pixelsImage.src = pixels_base64
     pixelsImage.onload = function() { 
-        configureTexture( pixelsImage );
+        pixelTexture = configureTexture( pixelsImage );
     } 
+
+    grassImage = new Image();
+    grassImage.crossOrigin = "anonymous";
+    grassImage.src = grass_base64
+    grassImage.onload = function() { 
+        grassTexture =configureTexture( grassImage );
+    } 
+
 
     // add some movement controls :D
     addEventListener("keypress", (k) => {
@@ -419,9 +432,13 @@ function render() {
     let bootySwingAngle = 0 + (Math.sin(kft * Math.PI * 2)+1) * -10
     figure[buttID].transform = mult(figure[buttID].translate, rotateZ(bootySwingAngle+1))
 
+    gl.bindTexture( gl.TEXTURE_2D, grassTexture );
+    gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
     groundPlane()
-
+    gl.bindTexture( gl.TEXTURE_2D, pixelTexture );
+    gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
     traverse(chestID)
+
     stack = []
 
     kft += 0.01
@@ -431,3 +448,4 @@ function render() {
     kft = clamp(kft, 0, 1)
     requestAnimFrame(render)
 }
+
