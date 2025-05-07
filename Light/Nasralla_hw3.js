@@ -33,6 +33,8 @@ var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 var isLightMoving = false
 
 let currMaterial
+let fn
+let stepCount = 0.01
 // materials
 pearl = {
     materialAmbient: vec4( 0.25, 0.20725, 0.20725, 1.0 ),
@@ -70,6 +72,7 @@ window.onload = function init() {
     program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
+    fn = cylinder
     resetBuffer(cylinder)
     setMaterial(gold)
     
@@ -83,7 +86,6 @@ window.onload = function init() {
     // UI
     shapeSel = document.getElementById("shape-select")
     shapeSel.addEventListener('change', () =>{
-        let fn
         switch(shapeSel.value){
             case("Cylinder"): {fn = cylinder} break
             case("SOR"): {fn = sor} break
@@ -131,6 +133,12 @@ window.onload = function init() {
                 isLightMoving = true;            
         }
     })
+
+    stepSel = document.getElementById("sub-slider")
+    stepSel.addEventListener('change', ()=>{
+        stepCount = parseFloat(stepSel.value)
+        resetBuffer(fn)
+    })
 	mouseControls();
     render()
 }
@@ -157,8 +165,8 @@ function setMaterial(material){
 }
 
 // I want to reset all buffers when changing shapes 
-function resetBuffer(fn){
-    generatePoints(fn, -1, 1, 0.01, radians(10))
+function resetBuffer(f){
+    generatePoints(f, -1, 1, stepCount, radians(10))
 
     // elements buffer
     var iBuffer = gl.createBuffer()
