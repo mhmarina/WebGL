@@ -12,6 +12,7 @@
     gap: 20px;
     font-family: 'Courier New', Courier, monospace;
     font-weight: bolder;
+    height: 20px;
 
     a{
         color: green
