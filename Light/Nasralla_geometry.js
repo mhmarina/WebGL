@@ -31,7 +31,7 @@ function generatePoints(f, a, b, stepT, stepTheta){
     // build object from bottom to top
     // the first "stepTheta" points build the bottom most circle (at t = -1)
     for(t = a; t <= b; t += stepT){
-        for(theta = 0; theta <= radians(360); theta += stepTheta){
+        for(theta = 0; theta < radians(360); theta += stepTheta){
             // rotate about y
             // we know that z is 0 in f(t) so we'll just use the x component
             x = f[0](t) * Math.cos(theta)
@@ -59,7 +59,7 @@ function generateIndices(stepTheta){
     // .
     // |\
     // .-.
-    for(i = 0; i < points.length - numSteps; i++){
+    for(i = 0; i < points.length - numSteps-1; i++){
         indices.push(i)
         indices.push(i+numSteps)
         indices.push(i+numSteps+1)
