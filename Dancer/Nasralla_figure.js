@@ -88,6 +88,8 @@ var eyeDepth = 0.3
 // with this butt translation: m = mult(m, translate(-0.5, -0.6, 0)) 
 var theta = [0, 0, 210, 150, 210, 150, 0, 0, 0, 0, 0, 0, 310] // standing pose, tail to the right, first frame in walk cycle
 
+var isGrounded = true
+
 // helper functions
 function scale4(a, b, c) {
     var result = mat4()
@@ -399,6 +401,11 @@ window.onload = function init() {
         if(k.key === 'd'){
             figure[chestID].transform = mult(figure[chestID].transform, rotate(-10, 0, 1, 0)) 
         }
+        if(k.key == ' ' && isGrounded){
+            isGrounded = false
+            figure[chestID].transform = mult(figure[chestID].transform, translate(0,5,0,1))
+        }
+        console.log(figure[chestID])
     })
     
    mouseControls()
@@ -431,6 +438,13 @@ function render() {
 
     let bootySwingAngle = 0 + (Math.sin(kft * Math.PI * 2)+1) * -10
     figure[buttID].transform = mult(figure[buttID].translate, rotateZ(bootySwingAngle+1))
+
+    if(!isGrounded){
+        figure[chestID].transform = mult(figure[chestID].transform, translate(0,-0.5,0,1))
+        if(figure[chestID].transform[1][3] <= 0){
+            isGrounded = true
+        }
+    }
 
     gl.bindTexture( gl.TEXTURE_2D, grassTexture );
     gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
