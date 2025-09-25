@@ -89,6 +89,10 @@ var eyeDepth = 0.3
 var theta = [0, 0, 210, 150, 210, 150, 0, 0, 0, 0, 0, 0, 310] // standing pose, tail to the right, first frame in walk cycle
 
 var isGrounded = true
+const movementKeys = {}
+var movementSpeed = 0.5
+var rotationSpeed = 10
+var jumpHeight = 7
 
 // helper functions
 function scale4(a, b, c) {
@@ -386,30 +390,36 @@ window.onload = function init() {
         grassTexture =configureTexture( grassImage );
     } 
 
-
-    // add some movement controls :D
-    addEventListener("keypress", (k) => {
-        if(k.key === 'w'){
-            figure[chestID].transform = mult(figure[chestID].transform, translate(-1, 0, 0, 1))
-        }
-        if(k.key === 's'){
-            figure[chestID].transform = mult(figure[chestID].transform, translate(1, 0, 0, 1))
-        }
-        if(k.key === 'a'){
-            figure[chestID].transform = mult(figure[chestID].transform, rotate(10, 0, 1, 0)) 
-        }
-        if(k.key === 'd'){
-            figure[chestID].transform = mult(figure[chestID].transform, rotate(-10, 0, 1, 0)) 
-        }
-        if(k.key == ' ' && isGrounded){
-            isGrounded = false
-            figure[chestID].transform = mult(figure[chestID].transform, translate(0,5,0,1))
-        }
-        console.log(figure[chestID])
-    })
+    addEventListener("keydown", (e) => {
+        movementKeys[e.key] = true
+    });
     
+    this.addEventListener("keyup", (e) => {
+        movementKeys[e.key] = false
+    })
+
    mouseControls()
    render()
+}
+
+function move(){
+            // add some movement controls :D
+        if(movementKeys['w']){
+            figure[chestID].transform = mult(figure[chestID].transform, translate(-movementSpeed, 0, 0, 1))
+        }
+        if(movementKeys['s']){
+            figure[chestID].transform = mult(figure[chestID].transform, translate(movementSpeed, 0, 0, 1))
+        }
+        if(movementKeys['a']){
+            figure[chestID].transform = mult(figure[chestID].transform, rotate(rotationSpeed, 0, 1, 0)) 
+        }
+        if(movementKeys['d']){
+            figure[chestID].transform = mult(figure[chestID].transform, rotate(-rotationSpeed, 0, 1, 0))
+        }
+        if(movementKeys[' '] && isGrounded){
+            isGrounded = false
+            figure[chestID].transform = mult(figure[chestID].transform, translate(0,jumpHeight,0,1))
+        }
 }
 
 const clamp = (num, min, max) => {
@@ -445,6 +455,8 @@ function render() {
             isGrounded = true
         }
     }
+
+    move()
 
     gl.bindTexture( gl.TEXTURE_2D, grassTexture );
     gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
